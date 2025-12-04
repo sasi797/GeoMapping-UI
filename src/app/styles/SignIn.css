@@ -1,0 +1,558 @@
+/* === Full-page lively background === */
+.signin-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+  overflow: hidden;
+  background: white !important;
+  /* background: linear-gradient(0deg, #fafafa, #ffffff) !important; */
+  /* background: linear-gradient(-45deg, #ff6ec4, #7873f5, #42e695, #ffe29f); */
+  background-size: 400% 400%;
+  animation: gradientShift 12s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* === Floating Bubbles === */
+.floating-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.25;
+  animation: floatBubble 15s ease-in-out infinite;
+  filter: blur(3px);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+@keyframes floatBubble {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.2;
+  }
+
+  50% {
+    transform: translateY(-80px) scale(1.1);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.2;
+  }
+}
+
+.bubble1 {
+  width: 160px;
+  height: 160px;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+  background: rgba(255, 110, 196, 0.3);
+}
+
+.bubble2 {
+  width: 120px;
+  height: 120px;
+  bottom: 15%;
+  right: 15%;
+  animation-delay: 3s;
+  background: rgba(120, 115, 245, 0.25);
+}
+
+.bubble3 {
+  width: 200px;
+  height: 200px;
+  bottom: 5%;
+  left: 30%;
+  animation-delay: 5s;
+  background: rgba(66, 230, 149, 0.3);
+}
+
+.bubble4 {
+  width: 100px;
+  height: 100px;
+  top: 20%;
+  right: 20%;
+  animation-delay: 7s;
+  background: rgba(255, 200, 60, 0.25);
+}
+
+.bubble5 {
+  width: 80px;
+  height: 80px;
+  bottom: 35%;
+  left: 5%;
+  animation-delay: 9s;
+  background: rgba(255, 110, 196, 0.2);
+}
+
+/* === Left welcome text container === */
+.left-text {
+  position: absolute;
+  left: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 320px;
+  z-index: 2;
+  color: #2c2c2b;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Heading animation: float + swing + pulse */
+.left-text h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+
+  /* Popup on load */
+  animation: popupText 1.2s ease forwards, floatSwing 4s ease-in-out infinite, pulseGlow 2s ease-in-out infinite alternate;
+}
+
+/* Paragraph popup + continuous left-right float */
+.left-text p {
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0;
+
+  /* Initial popup from left + continuous float */
+  animation: popupLeft 1.2s ease forwards, floatTextX 3s ease-in-out infinite alternate;
+  animation-delay: 0.5s;
+  /* starts after heading */
+}
+
+/* Popup from left */
+@keyframes popupLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Continuous subtle left-right motion */
+@keyframes floatTextX {
+  0% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(10px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+
+.left-text .hand {
+  margin-left: 10px;
+  display: inline-block;
+  font-size: 2.5rem;
+
+  /* Vivid animated gradient setup */
+  background: linear-gradient(270deg,
+      #ff6ec4,
+      #7873f5,
+      #42e695,
+      #ffe29f,
+      #ff6ec4,
+      #ffb347,
+      #6a11cb);
+  background-size: 800% 800%;
+  /* larger size for smooth flow */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* Animations */
+  animation: popupHand 0.8s ease forwards, waveHand 1s infinite, gradientFlow 4s linear infinite;
+}
+
+/* === Keyframes === */
+
+/* Popup heading/paragraph */
+@keyframes popupText {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-10deg) translateY(20px);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1.2) rotate(5deg) translateY(-10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg) translateY(0);
+  }
+}
+
+/* Floating + swinging motion */
+@keyframes floatSwing {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  25% {
+    transform: translate(2px, -5px) rotate(-1deg);
+  }
+
+  50% {
+    transform: translate(-2px, 5px) rotate(1deg);
+  }
+
+  75% {
+    transform: translate(2px, -5px) rotate(-1deg);
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+/* Subtle pulsing glow */
+@keyframes pulseGlow {
+  0% {
+    transform: scale(1);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  }
+
+  50% {
+    transform: scale(1.03);
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+  }
+
+  100% {
+    transform: scale(1);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  }
+}
+
+
+/* Gradient flow animation */
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Hand popup from left with scale */
+@keyframes popupHand {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px) scale(0.5);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateX(10px) scale(1.2);
+  }
+
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* Hand waving */
+@keyframes waveHand {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(15deg);
+  }
+
+  50% {
+    transform: rotate(-10deg);
+  }
+
+  75% {
+    transform: rotate(15deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.signin-card {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  margin-right: 60px;
+
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.043);
+  background: rgba(250, 250, 250, 0) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+  padding: 3.5rem;
+  gap: 1.5rem;
+  width: 400px;
+
+  /* for smooth scaling */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, width 0.3s ease, height 0.3s ease;
+}
+
+.signin-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+}
+
+
+/* === Title inside white card (solid white, lively) === */
+.signin-title {
+  font-weight: 800 !important;
+  text-align: center;
+  font-size: 24px !important;
+  /* increased font size */
+  letter-spacing: 2px;
+  color: #2c2c2b;
+  /* solid white */
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  display: inline-block;
+  position: relative;
+
+  /* Animations */
+  animation: titlePopup 1s ease forwards, floatX 4s ease-in-out infinite alternate;
+}
+
+/* Popup + scale effect for title */
+@keyframes titlePopup {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(10px);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1.1) translateY(-5px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Subtle horizontal float for continuous liveliness */
+@keyframes floatX {
+  0% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(5px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+
+/* === Inputs inside white card === */
+.signin-input .MuiOutlinedInput-root {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: none !important;
+  transition: all 0.3s ease;
+  opacity: 0;
+  animation: inputPopup 1s ease forwards;
+  animation-delay: 0.3s;
+  /* slightly after title */
+}
+
+/* Focused input animation — grey border */
+.signin-input .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #a4a49c !important;
+  /* lighter grey */
+  border-width: 1px !important;
+}
+
+/* Focused input animation */
+.signin-input .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  transform: scale(1.02);
+}
+
+/* Focused label color */
+.signin-input .MuiInputLabel-root.Mui-focused {
+  color: #2c2c2b;
+}
+
+/* Popup animation for inputs */
+@keyframes inputPopup {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* === Button inside white card === */
+.signin-button {
+  padding: 1rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #120d71, #8BC6EC, #120d71);
+  /* animated gradient */
+  background-size: 200% 200%;
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(108, 99, 255, 0.25);
+  transition: all 0.3s ease;
+  animation: gradientButton 5s ease infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signin-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 40px rgba(108, 99, 255, 0.5);
+}
+
+/* Gradient animation */
+@keyframes gradientButton {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Optional: icon animation on hover */
+.signin-button .MuiButton-startIcon {
+  transition: transform 0.3s ease;
+}
+
+.signin-button:hover .MuiButton-startIcon {
+  transform: rotate(20deg) scale(1.2);
+}
+
+/* === Footer links for white card === */
+.signin-links {
+  display: flex;
+  gap: 8px;
+  /* changed from 4 to 8px for proper spacing */
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.signin-links a {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* space between icon and text */
+  color: #144d9c;
+  /* default text color */
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.signin-links a:hover {
+  color: #0b1e4f;
+  text-decoration: underline;
+  /* dark blue on hover */
+  transform: scale(1.1);
+  /* slightly grow on hover */
+}
+
+.signin-links span {
+  color: #555;
+}
+
+/* === Responsive === */
+@media (max-width: 1024px) {
+  .left-text {
+    left: 40px;
+  }
+
+  .signin-card {
+    margin-right: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .signin-wrapper {
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .left-text {
+    position: relative;
+    top: auto;
+    transform: none;
+    text-align: center;
+    margin-bottom: 2rem;
+    left: auto;
+  }
+
+  .signin-card {
+    margin-right: auto;
+    width: 90%;
+  }
+}
