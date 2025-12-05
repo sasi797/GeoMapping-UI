@@ -315,13 +315,13 @@ export default function MappingScreen() {
           <Tab
             icon={<ShareLocationIcon sx={{ fontSize: 18 }} />}
             iconPosition="start"
-            label="Upload Drop Location"
+            label="Drop Locations"
             disableRipple
           />
           <Tab
             icon={<LocationOnIcon sx={{ fontSize: 18 }} />}
             iconPosition="start"
-            label="Upload FSL Location"
+            label="FSL Locations"
             disableRipple
           />
           <Tab
