@@ -6,16 +6,14 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   TablePagination,
   Box,
   TextField,
-  IconButton,
 } from "@mui/material";
 import { useState, useMemo } from "react";
 import { ArrowUpward, ArrowDownward, Search } from "@mui/icons-material";
 
-const CustomTable = ({ columns, data, actions }) => {
+const CustomTable = ({ columns, data, actions, height }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchText, setSearchText] = useState("");
@@ -113,7 +111,7 @@ const CustomTable = ({ columns, data, actions }) => {
           }}
         />
       </Box>
-      <TableContainer sx={{ maxHeight: 250 }}>
+      <TableContainer sx={{ maxHeight: height }}>
         <Table size="small" stickyHeader>
           <TableHead>
             <TableRow>

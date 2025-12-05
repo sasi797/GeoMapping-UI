@@ -15,6 +15,8 @@ import {
   Paper,
   TextField,
   IconButton,
+  Chip,
+  Switch,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -175,6 +177,92 @@ export default function MappingScreen() {
     transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] },
   };
 
+  const [mode, setMode] = useState("warehouse");
+  // ---------------------- STATE ----------------------
+  const [warehouses, setWarehouses] = useState([
+    {
+      id: 1,
+      siteId: "WH-001",
+      street: "123 Main St",
+      city: "Houston",
+      depotType: "Primary",
+      status: "Active",
+    },
+    {
+      id: 2,
+      siteId: "WH-002",
+      street: "45 Broadway",
+      city: "Dallas",
+      depotType: "Secondary",
+      status: "Active",
+    },
+    {
+      id: 3,
+      siteId: "WH-003",
+      street: "88 Park Ave",
+      city: "Austin",
+      depotType: "Crossdock",
+      status: "Inactive",
+    },
+    {
+      id: 3,
+      siteId: "WH-003",
+      street: "88 Park Ave",
+      city: "Austin",
+      depotType: "Crossdock",
+      status: "Inactive",
+    },
+    {
+      id: 3,
+      siteId: "WH-003",
+      street: "88 Park Ave",
+      city: "Austin",
+      depotType: "Crossdock",
+      status: "Inactive",
+    },
+    {
+      id: 3,
+      siteId: "WH-003",
+      street: "88 Park Ave",
+      city: "Austin",
+      depotType: "Crossdock",
+      status: "Inactive",
+    },
+    {
+      id: 3,
+      siteId: "WH-003",
+      street: "88 Park Ave",
+      city: "Austin",
+      depotType: "Crossdock",
+      status: "Inactive",
+    },
+  ]);
+
+  // State for selected warehouses (toggle)
+  const [selectedWarehouse, setSelectedWarehouse] = useState({});
+
+  // ---------------------- HELPER: COLOR BY DEPOT TYPE ----------------------
+  const depotColor = (type) => {
+    switch (type) {
+      case "Primary":
+        return { bg: "#e1f5fe", color: "#0277bd" };
+      case "Secondary":
+        return { bg: "#ede7f6", color: "#5e35b1" };
+      case "Crossdock":
+        return { bg: "#e8f5e9", color: "#2e7d32" };
+      default:
+        return { bg: "#eeeeee", color: "#424242" };
+    }
+  };
+
+  // ---------------------- TOGGLE HANDLER ----------------------
+  const toggleWarehouse = (id) => {
+    setSelectedWarehouse((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   return (
     <Box sx={{ fontFamily: "Roboto, sans-serif" }}>
       <Typography
@@ -328,6 +416,7 @@ export default function MappingScreen() {
               </Typography>
 
               <CustomTable
+                height={250}
                 columns={dropLocationColumns}
                 data={petrolStationData}
                 emptyText="No Drop Location available."
@@ -338,48 +427,191 @@ export default function MappingScreen() {
 
         {tab === 1 && (
           <motion.div key="tab2" {...tabAnim}>
-            {/* ---------------- TAB 1 – Upload Excel ---------------- */}
+            {/* ------- TOP TOGGLE BUTTONS ------- */}
             <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              mb={2}
+              sx={{
+                display: "inline-flex",
+                background: "#e9edf7",
+                padding: "3px",
+                borderRadius: "24px",
+                mb: 3,
+              }}
             >
-              <Typography
-                variant="body2"
-                sx={{ color: "#666", fontWeight: 500 }}
-              >
-                Upload Excel (.xlsx) To Preview FSL Locations
-              </Typography>
-
+              {/* Select Warehouses */}
               <Button
-                variant="contained"
-                component="label"
-                startIcon={<CloudUploadIcon />}
+                onClick={() => setMode("warehouse")}
+                startIcon={<WarehouseIcon sx={{ fontSize: 16 }} />}
                 sx={{
-                  backgroundColor: "#dce6f7",
-                  color: "#0b2a55",
-                  "&:hover": { backgroundColor: "#c9d8ef" },
                   textTransform: "none",
-                  fontWeight: 600,
+                  fontWeight: 500,
+                  fontSize: "0.78rem",
+                  px: 2,
+                  py: 0.5,
+                  minHeight: "28px",
+                  borderRadius: "24px",
+                  backgroundColor:
+                    mode === "warehouse" ? "#0b2a55" : "transparent",
+                  color: mode === "warehouse" ? "#fff" : "#0b2a55",
+                  "&:hover": {
+                    backgroundColor:
+                      mode === "warehouse" ? "#0a244a" : "rgba(11,42,85,0.08)",
+                  },
+                  transition: "all 0.2s ease",
                 }}
               >
-                Upload Excel
-                <input type="file" hidden />
+                Warehouse
+              </Button>
+
+              {/* Upload Excel */}
+              <Button
+                onClick={() => setMode("upload")}
+                startIcon={<CloudUploadIcon sx={{ fontSize: 16 }} />}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 500,
+                  fontSize: "0.78rem",
+                  px: 2,
+                  py: 0.5,
+                  minHeight: "28px",
+                  borderRadius: "24px",
+                  backgroundColor:
+                    mode === "upload" ? "#0b2a55" : "transparent",
+                  color: mode === "upload" ? "#fff" : "#0b2a55",
+                  "&:hover": {
+                    backgroundColor:
+                      mode === "upload" ? "#0a244a" : "rgba(11,42,85,0.08)",
+                  },
+                  transition: "all 0.2s ease",
+                }}
+              >
+                Upload
               </Button>
             </Box>
 
-            <Box mt={1} sx={{ maxHeight: "65vh", overflow: "auto" }}>
-              <Typography mb={1} fontWeight="600" sx={{ color: "#555555" }}>
-                FSL Location List
-              </Typography>
+            {/* ---------------- TAB 1 – Upload Excel ---------------- */}
+            {mode === "warehouse" && (
+              <motion.div key="tab1" {...tabAnim}>
+                <Typography mb={1} fontWeight="bold" sx={{ color: "#555555" }}>
+                  Select Warehouses
+                </Typography>
+                <Card sx={{ maxHeight: "60vh", overflow: "auto" }}>
+                  {/* <CardContent> */}
+                  <List sx={{ p: 1 }}>
+                    {warehouses.map((wh) => (
+                      <ListItem
+                        key={wh.id}
+                        secondaryAction={
+                          <Switch
+                            size="small"
+                            checked={selectedWarehouse[wh.id] || false}
+                            onChange={() => toggleWarehouse(wh.id)}
+                          />
+                        }
+                        sx={{
+                          mb: 0.5,
+                          py: 0.3,
+                          px: 1,
+                          borderRadius: "6px",
+                          border: "1px solid #e5e5e5",
+                          "&:hover": { backgroundColor: "#f4f6fc" },
+                          minHeight: "38px",
+                        }}
+                      >
+                        <ListItemText
+                          primary={`${wh.siteId} - ${wh.street}, ${wh.city}`}
+                          primaryTypographyProps={{
+                            fontWeight: 600,
+                            fontSize: "0.8rem",
+                            color: "#444",
+                          }}
+                          secondary={
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                mt: 0.2,
+                              }}
+                            >
+                              <Chip
+                                label={wh.depotType}
+                                size="small"
+                                sx={{
+                                  height: 20,
+                                  fontSize: "0.7rem",
+                                  mr: 0.6,
+                                  backgroundColor: depotColor(wh.depotType).bg,
+                                  color: depotColor(wh.depotType).color,
+                                  fontWeight: 500,
+                                }}
+                              />
+                              <Chip
+                                label={wh.status}
+                                size="small"
+                                sx={{
+                                  height: 20,
+                                  fontSize: "0.7rem",
+                                }}
+                              />
+                            </Box>
+                          }
+                          secondaryTypographyProps={{
+                            component: "div",
+                          }}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                  {/* </CardContent> */}
+                </Card>
+              </motion.div>
+            )}
 
-              <CustomTable
-                columns={fslLocationColumns}
-                data={warehousesData}
-                emptyText="No FSL Location available."
-              />
-            </Box>
+            {mode === "upload" && (
+              <>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mb={2}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "#666", fontWeight: 500 }}
+                  >
+                    Upload Excel (.xlsx) To Preview FSL Locations
+                  </Typography>
+
+                  <Button
+                    variant="contained"
+                    component="label"
+                    startIcon={<CloudUploadIcon />}
+                    sx={{
+                      backgroundColor: "#dce6f7",
+                      color: "#0b2a55",
+                      "&:hover": { backgroundColor: "#c9d8ef" },
+                      textTransform: "none",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Upload Excel
+                    <input type="file" hidden />
+                  </Button>
+                </Box>
+
+                <Box mt={1} sx={{ maxHeight: "55vh", overflow: "auto" }}>
+                  <Typography mb={1} fontWeight="600" sx={{ color: "#555555" }}>
+                    FSL Location List
+                  </Typography>
+
+                  <CustomTable
+                    height={180}
+                    columns={fslLocationColumns}
+                    data={warehousesData}
+                    emptyText="No FSL Location available."
+                  />
+                </Box>
+              </>
+            )}
           </motion.div>
         )}
 
