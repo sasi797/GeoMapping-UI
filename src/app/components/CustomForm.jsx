@@ -1,4 +1,3 @@
-"use client";
 import { useState } from "react";
 import {
   Grid,
@@ -38,7 +37,10 @@ const CustomForm = ({ formSchema, formData, onChange }) => {
   const validateField = (field, value) => {
     const { rules = {}, label } = field;
 
-    if (field.required && (value === "" || value === null || value === undefined)) {
+    if (
+      field.required &&
+      (value === "" || value === null || value === undefined)
+    ) {
       return `${label} is required`;
     }
 
@@ -71,7 +73,6 @@ const CustomForm = ({ formSchema, formData, onChange }) => {
 
     return ""; // ✅ no error
   };
-
 
   return (
     <div>
@@ -163,7 +164,8 @@ const CustomForm = ({ formSchema, formData, onChange }) => {
                         display: "flex",
                         flexDirection: "column",
                         minWidth:
-                          field.type === "select" || field.type === "multiselect"
+                          field.type === "select" ||
+                          field.type === "multiselect"
                             ? 200
                             : "auto",
                       }}
@@ -178,7 +180,6 @@ const CustomForm = ({ formSchema, formData, onChange }) => {
                     </Grid>
                   );
                 })}
-
             </Grid>
           </AccordionDetails>
         </Accordion>

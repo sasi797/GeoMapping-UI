@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import {
   Box,
@@ -17,6 +16,12 @@ import {
   IconButton,
   Chip,
   Switch,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -48,6 +53,9 @@ import WarehouseIcon from "@mui/icons-material/Warehouse";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import { dropLocationAddress } from "./geoLocationData";
 import { fslLocationAddress } from "./GeoLocationFSLData";
+import LocationOn from "@mui/icons-material/LocationOn";
+import HomeWork from "@mui/icons-material/HomeWork";
+import LocalShipping from "@mui/icons-material/LocalShipping";
 
 export default function MappingScreen() {
   const [tab, setTab] = useState(0);
@@ -284,6 +292,8 @@ export default function MappingScreen() {
         <Tabs
           value={tab}
           onChange={(e, v) => setTab(v)}
+          variant="scrollable"
+          scrollButtons="auto"
           sx={{
             minHeight: "40px",
             backgroundColor: "#f9f9f9",
@@ -315,13 +325,13 @@ export default function MappingScreen() {
           <Tab
             icon={<ShareLocationIcon sx={{ fontSize: 18 }} />}
             iconPosition="start"
-            label="Drop Locations"
+            label="Upload Map to Locations"
             disableRipple
           />
           <Tab
             icon={<LocationOnIcon sx={{ fontSize: 18 }} />}
             iconPosition="start"
-            label="FSL Locations"
+            label="Upload Map from Locations"
             disableRipple
           />
           <Tab
@@ -998,7 +1008,6 @@ export default function MappingScreen() {
           <motion.div key="tab4" {...tabAnim}>
             {/* ---------------- TAB 4 – Mapping Screen ---------------- */}
             <div sx={{ maxHeight: "77vh", overflow: "visible" }}>
-              {/* <CardContent> */}
               {/* TOP BAR */}
               <Box
                 display="flex"
@@ -1042,94 +1051,107 @@ export default function MappingScreen() {
                 </Box>
               </Box>
 
-              <Box display="flex" gap={2}>
-                {/* LEFT PANEL */}
-                <Paper
-                  elevation={1}
-                  sx={{
-                    width: "35%",
-                    height: "380px", // 🔥 fixed height so scroll always works
-                    overflowY: "auto",
-                    borderRadius: 2,
-                    p: 0,
-                  }}
-                >
-                  <List sx={{ p: 0 }}>
-                    {petrolStationData.map((p, idx) => (
-                      <ListItem
-                        button
-                        key={p.siteId}
-                        onClick={() => setSplitSelected(idx)}
-                        sx={{
-                          bgcolor:
-                            splitSelected === idx ? "#f2f2f2" : "transparent",
-                          "&:hover": { bgcolor: "#f5f7ff" },
-                          borderBottom: "1px solid #eee",
-                        }}
-                      >
-                        <ListItemText
-                          primary={p.siteId}
-                          secondary={`${p.street}, ${p.city}`}
+              <TableContainer sx={{ maxHeight: 400 }}>
+                <Table stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 700, color: "#555555" }}>
+                        <LocationOn
+                          fontSize="small"
+                          sx={{ mr: 1, verticalAlign: "middle" }}
                         />
-                      </ListItem>
-                    ))}
-                  </List>
-                </Paper>
+                        Site ID
+                      </TableCell>
 
-                {/* RIGHT PANEL */}
-                <Paper
-                  elevation={1}
-                  sx={{
-                    flex: 1,
-                    height: "380px", // 🔥 fixed height to allow scroll
-                    overflowY: "auto",
-                    borderRadius: 2,
-                    p: 1,
-                  }}
-                >
-                  <Typography fontWeight="600" mb={2} sx={{ color: "#555555" }}>
-                    Top 3 Warehouses for{" "}
-                    {petrolStationData[splitSelected]?.siteId}
-                  </Typography>
+                      <TableCell sx={{ fontWeight: 700, color: "#555555" }}>
+                        <HomeWork
+                          fontSize="small"
+                          sx={{ mr: 1, verticalAlign: "middle" }}
+                        />
+                        Address
+                      </TableCell>
 
-                  {(
-                    mappingData[petrolStationData[splitSelected]?.siteId] || []
-                  ).map((w) => (
-                    <Card
-                      key={w.warehouseId}
-                      sx={{
-                        p: 1,
-                        mb: 2,
-                        borderRadius: 2,
-                        background: `
-                          linear-gradient(#f9fafb, #f9fafb) padding-box,
-                          linear-gradient(to bottom, #1f3c88, #6c757d) border-box
-                        `,
-                        borderLeft: "5px solid transparent",
-                        "&:hover": { backgroundColor: "#f0f4ff" },
-                      }}
-                    >
-                      <Typography fontWeight="600" sx={{ color: "#555555" }}>
-                        {w.name}
-                      </Typography>
-                      <Typography variant="body2">
-                        Distance: {w.distance} km
-                      </Typography>
-                      <Typography variant="body2">
-                        Duration: {w.duration}
-                      </Typography>
-                    </Card>
-                  ))}
+                      <TableCell sx={{ fontWeight: 700, color: "#555555" }}>
+                        <LocalShipping
+                          fontSize="small"
+                          sx={{ mr: 1, verticalAlign: "middle" }}
+                        />
+                        Nearest Warehouse
+                      </TableCell>
 
-                  {(mappingData[petrolStationData[splitSelected]?.siteId] || [])
-                    .length === 0 && (
-                    <Typography variant="body2" color="text.secondary">
-                      No mapped warehouses
-                    </Typography>
-                  )}
-                </Paper>
-              </Box>
-              {/* </CardContent> */}
+                      <TableCell sx={{ fontWeight: 700, color: "#555555" }}>
+                        <LocalShipping
+                          fontSize="small"
+                          sx={{ mr: 1, verticalAlign: "middle" }}
+                        />
+                        2nd Nearest
+                      </TableCell>
+
+                      <TableCell sx={{ fontWeight: 700, color: "#555555" }}>
+                        <LocalShipping
+                          fontSize="small"
+                          sx={{ mr: 1, verticalAlign: "middle" }}
+                        />
+                        3rd Nearest
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+
+                  <TableBody>
+                    {petrolStationData.map((station) => {
+                      const warehouses = mappingData[station.siteId] || [];
+
+                      // Ensure exactly 3 columns (fill empty ones with null)
+                      const top3 = [
+                        warehouses[0] || null,
+                        warehouses[1] || null,
+                        warehouses[2] || null,
+                      ];
+
+                      return (
+                        <TableRow key={station.siteId}>
+                          <TableCell>{station.siteId}</TableCell>
+
+                          <TableCell>
+                            <strong>{station.street}</strong>
+                            <br />
+                            {station.city}
+                          </TableCell>
+
+                          {top3.map((w, idx) => (
+                            <TableCell key={idx} sx={{ verticalAlign: "top" }}>
+                              {w ? (
+                                <>
+                                  <Typography component="div" fontWeight={600}>
+                                    {w.name}
+                                  </Typography>
+                                  <Typography component="div" variant="body2">
+                                    Distance: {w.distance} km
+                                  </Typography>
+                                  <Typography
+                                    component="div"
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
+                                    Duration: {w.duration}
+                                  </Typography>
+                                </>
+                              ) : (
+                                <Typography
+                                  component="div"
+                                  color="text.secondary"
+                                >
+                                  No warehouse
+                                </Typography>
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </div>
           </motion.div>
         )}
