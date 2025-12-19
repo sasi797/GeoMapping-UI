@@ -17,51 +17,16 @@ import {
   Tooltip,
 } from "@mui/material";
 import {
-  DashboardOutlined as DashboardIcon,
-  // FolderOutlined as FolderIcon,
-  TableChartOutlined as TableChartIcon,
   LogoutOutlined as LogoutIcon,
-  // SearchOutlined as SearchIcon,
-  // AddOutlined as AddIcon,
   ArrowDropDown as ArrowDropDownIcon,
   HelpOutline as HelpIcon,
   SettingsOutlined as SettingsIcon,
-  LocalShippingOutlined as TruckIcon,
-  LocationOnOutlined as LocationIcon,
-  // 🔽 Add these
-  PersonOutline as PersonIcon, // Driver
-  BusinessCenterOutlined as BusinessIcon, // Client
-  StorefrontOutlined as StorefrontIcon,
   GroupOutlined,
-  BusinessOutlined,
-  AppsOutlined,
-  TuneRounded,
 } from "@mui/icons-material";
 
 const drawerWidth = 220;
 
-const topMenus = [
-  // {
-  //   text: "Dashboard",
-  //   icon: <DashboardIcon sx={{ fontSize: 20 }} />,
-  //   href: "/dashboard/statistics",
-  // },
-  // {
-  //   text: "Menu Profile",
-  //   icon: <AppsOutlined sx={{ fontSize: 20 }} />,
-  //   href: "/dashboard/menu-profile",
-  // },
-  // {
-  //   text: "User Codes",
-  //   icon: <TuneRounded sx={{ fontSize: 20 }} />,
-  //   href: "/dashboard/user-codes",
-  // },
-  // {
-  //   text: "Configuration",
-  //   icon: <TableChartIcon sx={{ fontSize: 20 }} />,
-  //   href: "/dashboard/settings",
-  // },
-];
+const topMenus = [];
 
 const scrollMenus = [
   {
