@@ -8,8 +8,6 @@
   font-family: "Inter", sans-serif;
   overflow: hidden;
   background: white !important;
-  /* background: linear-gradient(0deg, #fafafa, #ffffff) !important; */
-  /* background: linear-gradient(-45deg, #ff6ec4, #7873f5, #42e695, #ffe29f); */
   background-size: 400% 400%;
   animation: gradientShift 12s ease infinite;
 }
@@ -28,84 +26,109 @@
   }
 }
 
-/* === Floating Bubbles === */
-.floating-bg {
+/* === Map Background === */
+.map-bg {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   overflow: hidden;
   z-index: 1;
+  background: radial-gradient(
+    circle at center,
+    rgba(120, 115, 245, 0.08),
+    transparent 60%
+  );
 }
 
-.bubble {
+/* === User Location (Center Pin) === */
+.user-location {
   position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  background: #7873f5;
   border-radius: 50%;
-  opacity: 0.25;
-  animation: floatBubble 15s ease-in-out infinite;
-  filter: blur(3px);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 20px rgba(120, 115, 245, 0.9);
 }
 
-@keyframes floatBubble {
-  0% {
-    transform: translateY(0) scale(1);
-    opacity: 0.2;
-  }
-
-  50% {
-    transform: translateY(-80px) scale(1.1);
-    opacity: 0.5;
-  }
-
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 0.2;
-  }
-}
-
-.bubble1 {
-  width: 160px;
-  height: 160px;
-  top: 10%;
-  left: 10%;
-  animation-delay: 0s;
-  background: rgba(255, 110, 196, 0.3);
-}
-
-.bubble2 {
+/* === Radar Rings === */
+.radar-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
   width: 120px;
   height: 120px;
-  bottom: 15%;
-  right: 15%;
-  animation-delay: 3s;
-  background: rgba(120, 115, 245, 0.25);
+  border-radius: 50%;
+  border: 1px solid rgba(120, 115, 245, 0.35);
+  transform: translate(-50%, -50%);
+  animation: radarPulse 4s linear infinite;
 }
 
-.bubble3 {
+.ring2 {
   width: 200px;
   height: 200px;
-  bottom: 5%;
-  left: 30%;
-  animation-delay: 5s;
-  background: rgba(66, 230, 149, 0.3);
+  animation-delay: 1.3s;
 }
 
-.bubble4 {
-  width: 100px;
-  height: 100px;
-  top: 20%;
-  right: 20%;
-  animation-delay: 7s;
-  background: rgba(255, 200, 60, 0.25);
+.ring3 {
+  width: 280px;
+  height: 280px;
+  animation-delay: 2.6s;
 }
 
-.bubble5 {
-  width: 80px;
-  height: 80px;
-  bottom: 35%;
-  left: 5%;
-  animation-delay: 9s;
-  background: rgba(255, 110, 196, 0.2);
+@keyframes radarPulse {
+  0% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* === Nearby Location Dots === */
+.location-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #42e695;
+  box-shadow: 0 0 10px rgba(66, 230, 149, 0.9);
+  animation: locationFloat 6s ease-in-out infinite;
+}
+
+.dot1 {
+  top: 40%;
+  left: 60%;
+}
+
+.dot2 {
+  top: 60%;
+  left: 45%;
+  animation-delay: 2s;
+}
+
+.dot3 {
+  top: 35%;
+  left: 35%;
+  animation-delay: 4s;
+}
+
+@keyframes locationFloat {
+  0% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
 }
 
 /* === Left welcome text container === */
@@ -132,7 +155,8 @@
   opacity: 0;
 
   /* Popup on load */
-  animation: popupText 1.2s ease forwards, floatSwing 4s ease-in-out infinite, pulseGlow 2s ease-in-out infinite alternate;
+  animation: popupText 1.2s ease forwards, floatSwing 4s ease-in-out infinite,
+    pulseGlow 2s ease-in-out infinite alternate;
 }
 
 /* Paragraph popup + continuous left-right float */
@@ -142,7 +166,8 @@
   opacity: 0;
 
   /* Initial popup from left + continuous float */
-  animation: popupLeft 1.2s ease forwards, floatTextX 3s ease-in-out infinite alternate;
+  animation: popupLeft 1.2s ease forwards,
+    floatTextX 3s ease-in-out infinite alternate;
   animation-delay: 0.5s;
   /* starts after heading */
 }
@@ -175,28 +200,30 @@
   }
 }
 
-
 .left-text .hand {
   margin-left: 10px;
   display: inline-block;
   font-size: 2.5rem;
 
   /* Vivid animated gradient setup */
-  background: linear-gradient(270deg,
-      #ff6ec4,
-      #7873f5,
-      #42e695,
-      #ffe29f,
-      #ff6ec4,
-      #ffb347,
-      #6a11cb);
+  background: linear-gradient(
+    270deg,
+    #ff6ec4,
+    #7873f5,
+    #42e695,
+    #ffe29f,
+    #ff6ec4,
+    #ffb347,
+    #6a11cb
+  );
   background-size: 800% 800%;
   /* larger size for smooth flow */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 
   /* Animations */
-  animation: popupHand 0.8s ease forwards, waveHand 1s infinite, gradientFlow 4s linear infinite;
+  animation: popupHand 0.8s ease forwards, waveHand 1s infinite,
+    gradientFlow 4s linear infinite;
 }
 
 /* === Keyframes === */
@@ -259,7 +286,6 @@
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
   }
 }
-
 
 /* Gradient flow animation */
 @keyframes gradientFlow {
@@ -336,14 +362,14 @@
   width: 400px;
 
   /* for smooth scaling */
-  transition: transform 0.3s ease, box-shadow 0.3s ease, width 0.3s ease, height 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, width 0.3s ease,
+    height 0.3s ease;
 }
 
 .signin-card:hover {
   transform: scale(1.02);
   box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
 }
-
 
 /* === Title inside white card (solid white, lively) === */
 .signin-title {
@@ -360,7 +386,8 @@
   position: relative;
 
   /* Animations */
-  animation: titlePopup 1s ease forwards, floatX 4s ease-in-out infinite alternate;
+  animation: titlePopup 1s ease forwards,
+    floatX 4s ease-in-out infinite alternate;
 }
 
 /* Popup + scale effect for title */
@@ -396,7 +423,6 @@
   }
 }
 
-
 /* === Inputs inside white card === */
 .signin-input .MuiOutlinedInput-root {
   border-radius: 12px;
@@ -410,7 +436,9 @@
 }
 
 /* Focused input animation — grey border */
-.signin-input .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+.signin-input
+  .MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
   border-color: #a4a49c !important;
   /* lighter grey */
   border-width: 1px !important;
@@ -445,14 +473,13 @@
   }
 }
 
-
 /* === Button inside white card === */
 .signin-button {
   padding: 1rem;
   font-weight: 700;
   font-size: 1.1rem;
   border-radius: 12px;
-  background: linear-gradient(90deg, #120d71, #8BC6EC, #120d71);
+  background: linear-gradient(90deg, #19164f, #8fa6b6, #120d71);
   /* animated gradient */
   background-size: 200% 200%;
   color: #fff;
@@ -554,5 +581,29 @@
   .signin-card {
     margin-right: auto;
     width: 90%;
+  }
+}
+
+.progress-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 5px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, #ffffff, transparent);
+  animation: loading 1.2s infinite;
+}
+
+@keyframes loading {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
   }
 }

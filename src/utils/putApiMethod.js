@@ -1,5 +1,3 @@
-import { customEncrypt } from "../app/components/SessionStorageSecurity";
-
 class ApiError extends Error {
   constructor(message, statusCode, encryptedData) {
     super(message);
@@ -12,45 +10,19 @@ export { ApiError };
 
 export const putApi = async (url, payload) => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const token = sessionStorage.getItem("verifyotp-jwt-token");
+  const token = sessionStorage.getItem("authtoken");
+  // console.log("envurl", process.env.REACT_APP_BASE_URL);
+  const fullUrl = `${baseUrl}/${url}`;
+  // const fullUrl = `/api/${url}`; // Use the Vercel proxy here
 
-  const urlParts = url.split("/");
-  const lastPart = urlParts.pop();
-
-  // Skip encryption for certain APIs
-  const skipEncryptionEndpoints = ["password-update"];
-
-  let encryptedUrl;
-  if (!skipEncryptionEndpoints.includes(lastPart)) {
-    if (/^\d+$/.test(lastPart)) {
-      // Case 1: single numeric ID
-      const encryptedId = customEncrypt(lastPart);
-      urlParts.push(encryptedId);
-    } else if (/^\d+(,\d+)+$/.test(lastPart)) {
-      // Case 2: multiple IDs separated by commas
-      const encryptedIds = lastPart
-        .split(",")
-        .map((id) => customEncrypt(id))
-        .join(",");
-      urlParts.push(encryptedIds);
-    } else {
-      // Case 3: not an ID → leave as is
-      urlParts.push(lastPart);
-    }
-    encryptedUrl = urlParts.join("/");
-  } else {
-    // No encryption for skipped endpoints
-    urlParts.push(lastPart);
-    encryptedUrl = urlParts.join("/");
-  }
-
-  const fullUrl = `${baseUrl}/${encryptedUrl}`;
   const isFormData = payload instanceof FormData;
 
-  const headers = { Authorization: `${token}` };
+  const headers = {
+    Authorization: `${token}`,
+  };
+
   if (!isFormData) {
     headers["Content-Type"] = "application/json";
-    headers["customer-id"] = "CUST001";
   }
 
   try {
@@ -60,22 +32,27 @@ export const putApi = async (url, payload) => {
       body: isFormData ? payload : JSON.stringify(payload),
     });
 
-    const text = await response.text();
-    const result = text ? JSON.parse(text) : {};
+    const result = await response.json();
 
     if (response.ok) {
+      // Return the successful result (with JWT and user details)
       return result;
     } else {
+      // Throw an error with the message from the response
+      // throw new Error(result.error?.message || "Something went wrong");
+      // throw new Error(result || "Failed to fetch data");
       throw new ApiError(
-        result?.message || "Failed to fetch data",
-        response.status,
-        lastPart
+        result.message || "Failed to fetch data",
+        result.statusCode,
+        result.encryptedData
       );
     }
   } catch (error) {
-    throw new ApiError(
-      error.message || "Network error",
-      error.statusCode || 500
-    );
+    // Catch network or other errors
+    // throw new Error(error || "Network error");
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(error.message || "Network error", 500, null);
   }
 };

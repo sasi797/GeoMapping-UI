@@ -1,16 +1,28 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../../styles/SignIn.css";
-import { Box, TextField, Typography, Button, Link } from "@mui/material";
-import { MdLock, MdHelpOutline, MdPersonAdd } from "react-icons/md";
+import {
+  Box,
+  TextField,
+  Typography,
+  Button,
+  Link,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { MdLock } from "react-icons/md";
+import useLogin from "@/api/login/Login";
+import CommonSnackbar from "@/app/components/CommonSnackbar";
+import { SIGN_IN } from "@/constant";
+// import { MdHelpOutline, MdPersonAdd } from "react-icons/md";
 
 const SignIn = () => {
   const router = useRouter();
 
   const [view, setView] = useState("signin");
-  const [flowType, setFlowType] = useState("signin"); // ⭐ NEW
+  const [flowType, setFlowType] = useState("signin");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,18 +30,35 @@ const SignIn = () => {
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
+  const [snackbarAlert, setSnackbarAlert] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const { login, signInLoading, snackbar, closeSnackbar } = useLogin();
 
   // ---------- NORMAL SIGN IN ----------
-  const handleSignIn = (e) => {
-    e.preventDefault();
+  const handleSignIn = async (data) => {
+    data.preventDefault();
 
     if (!email || !password) {
-      alert("Enter email & password");
+      setSnackbarAlert({
+        open: true,
+        message: "Please fill email & password fields.",
+        severity: "error",
+      });
       return;
     }
 
-    setFlowType("signin"); // ⭐ SET FLOW TYPE
-    setView("otp");
+    const payload = {
+      email: email,
+      password: password,
+    };
+
+    // login("login", payload);
+    login(SIGN_IN, payload, () => {
+      router.replace("/dashboard/mapping-tool");
+    });
   };
 
   // ---------- VERIFY OTP ----------
@@ -97,10 +126,16 @@ const SignIn = () => {
   return (
     <main className="signin-wrapper">
       {/* BG */}
-      <div className="floating-bg">
-        <div className="bubble bubble1"></div>
-        <div className="bubble bubble2"></div>
-        <div className="bubble bubble3"></div>
+      <div className="map-bg">
+        <div className="user-location"></div>
+
+        <div className="radar-ring ring1"></div>
+        <div className="radar-ring ring2"></div>
+        <div className="radar-ring ring3"></div>
+
+        <div className="location-dot dot1"></div>
+        <div className="location-dot dot2"></div>
+        <div className="location-dot dot3"></div>
       </div>
 
       {/* LEFT TEXT */}
@@ -108,7 +143,7 @@ const SignIn = () => {
         <h2>
           Welcome Back <span className="hand">👋</span>
         </h2>
-        <p>Access your dashboard and manage workflow seamlessly.</p>
+        <p>View nearby places and manage your location network effortlessly.</p>
       </div>
 
       {/* CARD */}
@@ -142,14 +177,16 @@ const SignIn = () => {
             <Button
               fullWidth
               variant="contained"
-              className="signin-button"
+              className="signin-button progress-btn"
               startIcon={<MdLock />}
               onClick={handleSignIn}
+              disabled={signInLoading}
             >
               Sign In
+              {signInLoading && <span className="progress-bar" />}
             </Button>
 
-            <Box className="signin-links">
+            {/* <Box className="signin-links">
               <Link className="signin-link" onClick={() => setView("forgot")}>
                 Forgot Password <MdHelpOutline />
               </Link>
@@ -157,7 +194,7 @@ const SignIn = () => {
               <Link className="signin-link" onClick={() => setView("signup")}>
                 <MdPersonAdd /> Sign Up
               </Link>
-            </Box>
+            </Box> */}
           </>
         )}
 
@@ -262,6 +299,29 @@ const SignIn = () => {
           </>
         )}
       </Box>
+
+      <Snackbar
+        open={snackbarAlert.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarAlert({ ...snackbarAlert, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setSnackbarAlert({ ...snackbarAlert, open: false })}
+          severity={snackbarAlert.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbarAlert.message}
+        </Alert>
+      </Snackbar>
+
+      <CommonSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={closeSnackbar}
+      />
     </main>
   );
 };

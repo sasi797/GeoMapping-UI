@@ -10,7 +10,7 @@ export { ApiError };
 
 export const postApi = async (url, payload) => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const token = sessionStorage.getItem("verifyotp-jwt-token");
+  const token = sessionStorage.getItem("authtoken");
   // console.log("envurl", process.env.REACT_APP_BASE_URL);
   const fullUrl = `${baseUrl}/${url}`;
   // const fullUrl = `/api/${url}`; // Use the Vercel proxy here
@@ -23,7 +23,6 @@ export const postApi = async (url, payload) => {
 
   if (!isFormData) {
     headers["Content-Type"] = "application/json";
-    headers["customer-id"] = "CUST001";
   }
 
   try {
