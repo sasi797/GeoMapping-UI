@@ -55,6 +55,13 @@ export default function FromLocationTab() {
     severity: "error",
   });
 
+  useEffect(() => {
+    const stored = sessionStorage.getItem("hasFromLocations") === "true";
+    if (stored) {
+      getFromLocations(GET_FROMLOCATIONS);
+    }
+  }, []);
+
   // useEffect(() => {
   //   getFromLocations(GET_FROMLOCATIONS);
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,13 +69,23 @@ export default function FromLocationTab() {
 
   useEffect(() => {
     if (fromLocationsResponse?.statusCode === 200) {
-      console.log("fromLocationsResponse", fromLocationsResponse);
-      setFromLocationApiData(fromLocationsResponse?.data?.rows);
-    } else {
-      console.log("API Failed");
+      const rows = fromLocationsResponse?.data?.rows || [];
+      setFromLocationApiData(rows);
+      const isValid = rows.length > 0;
+      sessionStorage.setItem("hasFromLocations", String(isValid));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromLocationsResponse]);
+
+  // useEffect(() => {
+  //   if (fromLocationsResponse?.statusCode === 200) {
+  //     console.log("fromLocationsResponse", fromLocationsResponse);
+  //     setFromLocationApiData(fromLocationsResponse?.data?.rows);
+  //   } else {
+  //     console.log("API Failed");
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [fromLocationsResponse]);
 
   const fromLocationColumns = [
     {

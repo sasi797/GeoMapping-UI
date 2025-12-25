@@ -53,7 +53,10 @@ export default function DashboardLayout({ children }) {
     }, {})
   );
 
-  const handleLogout = () => router.push("/auth/signin");
+  const handleLogout = () => {
+    sessionStorage.clear();
+    router.push("/auth/signin");
+  };
 
   return (
     <Box

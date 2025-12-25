@@ -229,7 +229,16 @@ export default function GeoMappingTab() {
     transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] },
   };
 
-  /* ---------------- RENDER ---------------- */
+  useEffect(() => {
+    const geoErrorState = {
+      dropErrorCount: dropLocationErrorCount,
+      fslErrorCount: fslLocationErrorCount,
+      hasErrors: dropLocationErrorCount > 0 || fslLocationErrorCount > 0,
+    };
+
+    sessionStorage.setItem("geoErrorState", JSON.stringify(geoErrorState));
+  }, [dropLocationErrorCount, fslLocationErrorCount]);
+
   return (
     <Box sx={{ fontFamily: "Roboto, sans-serif" }}>
       <AnimatePresence mode="wait">

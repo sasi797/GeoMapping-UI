@@ -42,20 +42,37 @@ export default function ToLocationTab() {
     severity: "error",
   });
 
+  useEffect(() => {
+    const stored = sessionStorage.getItem("hasToLocations") === "true";
+    if (stored) {
+      getToLocations(GET_TOLOCATIONS);
+    }
+  }, []);
+
   // useEffect(() => {
-  //   getToLocations(GET_TOLOCATIONS);
+  //     getToLocations(GET_TOLOCATIONS);
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, []);
 
   useEffect(() => {
     if (toLocationsResponse?.statusCode === 200) {
-      console.log("toLocationsResponse", toLocationsResponse);
-      setToLocationApiData(toLocationsResponse?.data?.rows);
-    } else {
-      console.log("API Failed");
+      const rows = toLocationsResponse?.data?.rows || [];
+      setToLocationApiData(rows);
+      const isValid = rows.length > 0;
+      sessionStorage.setItem("hasToLocations", String(isValid));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toLocationsResponse]);
+
+  // useEffect(() => {
+  //   if (toLocationsResponse?.statusCode === 200) {
+  //     console.log("toLocationsResponse", toLocationsResponse);
+  //     setToLocationApiData(toLocationsResponse?.data?.rows);
+  //   } else {
+  //     console.log("API Failed");
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [toLocationsResponse]);
 
   const toLocationColumns = [
     {
@@ -112,6 +129,7 @@ export default function ToLocationTab() {
     if (toLocationUploadResponse?.statusCode === 200) {
       console.log("toLocationUploadResponse", toLocationUploadResponse);
       getToLocations(GET_TOLOCATIONS);
+      // sessionStorage.setItem("hasToLocations", "true");
     } else {
       console.log("API Failed");
     }

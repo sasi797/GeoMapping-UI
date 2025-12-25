@@ -1,6 +1,18 @@
 "use client";
-import React, { useState } from "react";
-import { Box, Typography, Tabs, Tab, Button } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  Tabs,
+  Tab,
+  Button,
+  Snackbar,
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 import ShareLocationIcon from "@mui/icons-material/ShareLocation";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import GpsFixedIcon from "@mui/icons-material/GpsFixed";
@@ -14,6 +26,71 @@ import MappingTab from "./MappingPage";
 
 export default function MappingScreen() {
   const [tab, setTab] = useState(0);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "warning",
+  });
+  const [geoConfirmOpen, setGeoConfirmOpen] = useState(false);
+
+  const handleNext = () => {
+    // TAB 0 – mandatory
+    if (tab === 0) {
+      const hasToLocations =
+        sessionStorage.getItem("hasToLocations") === "true";
+
+      if (!hasToLocations) {
+        setSnackbar({
+          open: true,
+          message: "To Locations cannot be empty.",
+          severity: "warning",
+        });
+        return;
+      }
+    }
+
+    // TAB 1 – mandatory
+    if (tab === 1) {
+      const hasFromLocations =
+        sessionStorage.getItem("hasFromLocations") === "true";
+
+      if (!hasFromLocations) {
+        setSnackbar({
+          open: true,
+          message: "From Locations cannot be empty.",
+          severity: "warning",
+        });
+        return;
+      }
+    }
+
+    // TAB 2 – optional with warning
+    if (tab === 2) {
+      const geoErrorState = JSON.parse(
+        sessionStorage.getItem("geoErrorState") || "{}"
+      );
+
+      if (geoErrorState.hasErrors) {
+        setGeoConfirmOpen(true); // 🔥 ask confirmation
+        return;
+      }
+    }
+
+    // Default next
+    setTab((prev) => Math.min(prev + 1, 3));
+  };
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      sessionStorage.clear();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
   return (
     <Box sx={{ fontFamily: "Roboto, sans-serif" }}>
@@ -115,7 +192,8 @@ export default function MappingScreen() {
             className="btn-primary"
             variant="contained"
             endIcon={<MdArrowForward size={18} />}
-            onClick={() => setTab((prev) => Math.min(prev + 1, 3))}
+            // onClick={() => setTab((prev) => Math.min(prev + 1, 3))}
+            onClick={handleNext}
             disabled={tab === 3}
             sx={{
               textTransform: "none",
@@ -139,6 +217,49 @@ export default function MappingScreen() {
 
         {tab === 3 && <MappingTab />}
       </AnimatePresence>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+
+      <Dialog open={geoConfirmOpen} onClose={() => setGeoConfirmOpen(false)}>
+        <DialogTitle>Geo Coding Warnings</DialogTitle>
+
+        <DialogContent>
+          <Typography variant="body2">
+            Some locations have invalid latitude or longitude. You can proceed,
+            but mapping results may be inaccurate.
+          </Typography>
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setGeoConfirmOpen(false)} color="inherit">
+            Cancel
+          </Button>
+
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => {
+              setGeoConfirmOpen(false);
+              setTab((prev) => Math.min(prev + 1, 3));
+            }}
+          >
+            Proceed Anyway
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
