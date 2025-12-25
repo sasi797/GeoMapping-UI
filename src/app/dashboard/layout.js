@@ -52,6 +52,10 @@ export default function DashboardLayout({ children }) {
       return acc;
     }, {})
   );
+  const user =
+    typeof window !== "undefined"
+      ? JSON.parse(sessionStorage.getItem("user") || "{}")
+      : {};
 
   const handleLogout = () => {
     sessionStorage.clear();
@@ -96,7 +100,7 @@ export default function DashboardLayout({ children }) {
                 color: "#333",
               }}
             >
-              T
+              {user?.initial || "S"}
             </Box>
 
             <Box sx={{ flexGrow: 1, position: "relative" }}>
@@ -115,7 +119,7 @@ export default function DashboardLayout({ children }) {
                 onMouseLeave={() => setHovered(false)}
                 onClick={() => setCompanyOpen(!companyOpen)}
               >
-                Test
+                {user?.firstName || "SPL"}
                 {hovered && (
                   <ArrowDropDownIcon sx={{ fontSize: 16, color: "#666" }} />
                 )}
@@ -137,7 +141,7 @@ export default function DashboardLayout({ children }) {
                   sx={{ mt: 0.5, p: 1.2, bgcolor: "#f7f7f7" }}
                 >
                   <Typography sx={{ fontSize: 12, mb: 1, fontWeight: 600 }}>
-                    test@company.com
+                    {user?.fullName || "SPL-UNBOXED"}
                   </Typography>
                   <ListItemButton onClick={handleLogout} sx={{ py: 0.5 }}>
                     <ListItemIcon sx={{ minWidth: 28 }}>

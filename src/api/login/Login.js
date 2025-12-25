@@ -20,8 +20,20 @@ const useLogin = () => {
 
       if (response?.statusCode === 200) {
         // console.log("response", response);
+        const firstName = response?.first_name;
+        const lastName = response?.last_name;
+
         setSignInResponse(response);
         sessionStorage.setItem("authtoken", response?.token);
+        sessionStorage.setItem(
+          "user",
+          JSON.stringify({
+            firstName,
+            lastName,
+            fullName: `${firstName} ${lastName}`,
+            initial: firstName?.charAt(0)?.toUpperCase(),
+          })
+        );
         onSuccess?.();
 
         setSnackbar({
