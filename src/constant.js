@@ -6,3 +6,6 @@ export const GET_LOCATION_MAPPING = "location-mapping/resource";
 export const POST_TOUPLOAD = "drop-location/upload";
 export const POST_FROMUPLOAD = "depot-location/upload";
 export const POST_DOWNLOAD = "download-report";
+export const POST_TOLOCATION_TEMPLATE_DOWNLOAD = "download-report";
+export const POST_FROMLOCATION_TEMPLATE_DOWNLOAD = "download-report";
+export const POST_MAPPING_DOWNLOAD = "download-report";

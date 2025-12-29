@@ -31,8 +31,7 @@ const UseGetMapping = () => {
     } catch (error) {
       setSnackbarGetFromMapping({
         open: true,
-        message:
-          response?.errorMessage || "Failed To Fetch FromLocations Response",
+        message: response?.error || "Failed To Fetch Mapping Response",
         severity: "error",
       });
     } finally {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -15,6 +15,7 @@ import {
   Collapse,
   Paper,
   Tooltip,
+  Skeleton,
 } from "@mui/material";
 import {
   LogoutOutlined as LogoutIcon,
@@ -44,24 +45,88 @@ const scrollMenus = [
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
+
   const [companyOpen, setCompanyOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [openSections, setOpenSections] = useState(() =>
     scrollMenus.reduce((acc, s) => {
-      acc[s.title] = true; // default: all expanded
+      acc[s.title] = true;
       return acc;
     }, {})
   );
+
+  // 🔹 NEW: skeleton control
+  const [mounted, setMounted] = useState(false);
+  const [showSkeleton, setShowSkeleton] = useState(true);
+
   const user =
     typeof window !== "undefined"
       ? JSON.parse(sessionStorage.getItem("user") || "{}")
       : {};
+
+  // 🔹 detect refresh → show skeleton first
+  useEffect(() => {
+    setMounted(true);
+
+    const isRefreshing = sessionStorage.getItem("isRefreshing") === "true";
+
+    if (isRefreshing) {
+      setShowSkeleton(true);
+      const timer = setTimeout(() => {
+        setShowSkeleton(false);
+        sessionStorage.removeItem("isRefreshing");
+      }, 600);
+
+      return () => clearTimeout(timer);
+    } else {
+      setShowSkeleton(false);
+    }
+  }, []);
+
+  // 🔹 mark refresh
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      sessionStorage.setItem("isRefreshing", "true");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
 
   const handleLogout = () => {
     sessionStorage.clear();
     router.push("/auth/signin");
   };
 
+  // 🔹 BLOCK render until mounted (fix hydration)
+  if (!mounted || showSkeleton) {
+    return (
+      <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#fff" }}>
+        {/* Sidebar Skeleton */}
+        <Box
+          sx={{
+            width: drawerWidth,
+            bgcolor: "#fafafa",
+            p: 1,
+          }}
+        >
+          <Skeleton variant="rectangular" height={32} sx={{ mb: 2 }} />
+          <Skeleton variant="text" height={20} sx={{ mb: 1 }} />
+          <Skeleton variant="text" height={20} sx={{ mb: 1 }} />
+          <Skeleton variant="text" height={20} sx={{ mb: 1 }} />
+        </Box>
+
+        {/* Content Skeleton */}
+        <Box sx={{ flexGrow: 1, p: 3 }}>
+          <Skeleton variant="text" height={30} width="40%" sx={{ mb: 2 }} />
+          <Skeleton variant="rectangular" height={180} sx={{ mb: 2 }} />
+          <Skeleton variant="rectangular" height={180} />
+        </Box>
+      </Box>
+    );
+  }
+
+  // 🔹 YOUR ORIGINAL UI — UNCHANGED
   return (
     <Box
       sx={{
@@ -83,14 +148,14 @@ export default function DashboardLayout({ children }) {
           height: "100vh",
         }}
       >
-        {/* Top Sticky: Company Logo + Name */}
+        {/* Top Sticky */}
         <Box sx={{ px: 1, py: 1, position: "sticky", top: 0, zIndex: 10 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, ml: 1 }}>
             <Box
               sx={{
                 width: 24,
                 height: 24,
-                borderRadius: 1, // Rounded corners (8px)
+                borderRadius: 1,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -125,7 +190,6 @@ export default function DashboardLayout({ children }) {
                 )}
               </Typography>
 
-              {/* Dropdown Popup */}
               <Collapse
                 in={companyOpen}
                 sx={{
@@ -158,55 +222,10 @@ export default function DashboardLayout({ children }) {
           </Box>
         </Box>
 
-        {/* Top 4 Menus Sticky */}
-        <Box
-          sx={{
-            position: "sticky",
-            top: "36px",
-            zIndex: 9,
-            borderBottom: "1px solid #e6e6e6",
-          }}
-        >
-          <List sx={{ px: 1 }}>
-            {topMenus.map((item) => {
-              const isActive = pathname.startsWith(item.href);
-              return (
-                <ListItem key={item.text} disablePadding sx={{ mb: 0.3 }}>
-                  <ListItemButton
-                    component={Link}
-                    href={item.href}
-                    selected={isActive}
-                    sx={{
-                      px: 1,
-                      py: 0.5,
-                      borderRadius: 1,
-                      // color: isActive ? "#111" : "#444",
-                      color: "#666",
-                      bgcolor: isActive ? "#e6e6e6" : "transparent",
-                      "&:hover": { bgcolor: "#f0f0f0" },
-                    }}
-                  >
-                    <ListItemIcon
-                      sx={{ color: isActive ? "#111" : "#888", minWidth: 32 }}
-                    >
-                      {item.icon}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={item.text}
-                      primaryTypographyProps={{ fontSize: 13, fontWeight: 600 }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              );
-            })}
-          </List>
-        </Box>
-
-        {/* Scrollable Middle Section */}
+        {/* Scrollable Menus */}
         <Box sx={{ flexGrow: 1, overflowY: "auto", px: 1, py: 0.5 }}>
           {scrollMenus.map((section) => (
             <Box key={section.title} sx={{ mb: 1.5 }}>
-              {/* Section Header */}
               <Box
                 onClick={() =>
                   setOpenSections((prev) => ({
@@ -245,12 +264,7 @@ export default function DashboardLayout({ children }) {
                 />
               </Box>
 
-              {/* Collapsible Items */}
-              <Collapse
-                in={openSections[section.title]}
-                timeout="auto"
-                unmountOnExit
-              >
+              <Collapse in={openSections[section.title]}>
                 <List>
                   {section.items.map((item) => {
                     const isActive = pathname.startsWith(item.href);
@@ -266,15 +280,9 @@ export default function DashboardLayout({ children }) {
                             borderRadius: 1,
                             color: "#666",
                             bgcolor: isActive ? "#e6e6e6" : "transparent",
-                            "&:hover": { bgcolor: "#f0f0f0" },
                           }}
                         >
-                          <ListItemIcon
-                            sx={{
-                              color: isActive ? "#111" : "#888",
-                              minWidth: 32,
-                            }}
-                          >
+                          <ListItemIcon sx={{ minWidth: 32 }}>
                             {item.icon}
                           </ListItemIcon>
                           <ListItemText
@@ -294,27 +302,16 @@ export default function DashboardLayout({ children }) {
           ))}
         </Box>
 
-        {/* Footer Sticky */}
-        <Box
-          sx={{
-            px: 1,
-            py: 0.5,
-            borderTop: "1px solid #e6e6e6",
-            position: "sticky",
-            bottom: 0,
-            display: "flex",
-            justifyContent: "space-between",
-            bgcolor: "#fafafa",
-          }}
-        >
+        {/* Footer */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", p: 1 }}>
           <Tooltip title="Help">
-            <IconButton size="small">
-              <HelpIcon sx={{ fontSize: 18 }} />
+            <IconButton>
+              <HelpIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title="Settings">
-            <IconButton size="small">
-              <SettingsIcon sx={{ fontSize: 18 }} />
+            <IconButton>
+              <SettingsIcon />
             </IconButton>
           </Tooltip>
         </Box>

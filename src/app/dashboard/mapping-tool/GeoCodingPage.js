@@ -7,6 +7,7 @@ import {
   Typography,
   TextField,
   IconButton,
+  Skeleton,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
@@ -57,7 +58,8 @@ export default function GeoMappingTab() {
   } = useUpdateGeoCode();
 
   /* ---------------- DROP LOCATIONS ---------------- */
-  const { getToLocations, toLocationsResponse } = UseGetToLocations();
+  const { getToLocations, toLocationsResponse, toLocationsResponseLoading } =
+    UseGetToLocations();
   const [toLocationApiData, setToLocationApiData] = useState([]);
   const [dropSearch, setDropSearch] = useState("");
   const [filteredDrop, setFilteredDrop] = useState([]);
@@ -111,7 +113,11 @@ export default function GeoMappingTab() {
   };
 
   /* ---------------- FSL LOCATIONS ---------------- */
-  const { getFromLocations, fromLocationsResponse } = UseGetFromLocations();
+  const {
+    getFromLocations,
+    fromLocationsResponse,
+    fromLocationsResponseLoading,
+  } = UseGetFromLocations();
   const [fromLocationApiData, setFromLocationApiData] = useState([]);
   const [fslSearch, setFslSearch] = useState("");
   const [filteredFsl, setFilteredFsl] = useState([]);
@@ -317,125 +323,140 @@ export default function GeoMappingTab() {
                     </IconButton>
                   )}
                 </Box>
+                {toLocationsResponseLoading ? (
+                  Array.from({ length: 5 }).map((_, idx) => (
+                    <Box key={idx} display="flex" gap={2} mb={1}>
+                      <Skeleton variant="rectangular" width="50%" height={40} />
+                      <Skeleton variant="rectangular" width="50%" height={40} />
+                    </Box>
+                  ))
+                ) : (
+                  <>
+                    {filteredDrop.map((item, index) => {
+                      const isEditing =
+                        editing.type === "DROP" && editing.index === index;
 
-                {filteredDrop.map((item, index) => {
-                  const isEditing =
-                    editing.type === "DROP" && editing.index === index;
-
-                  return (
-                    <Box key={index} display="flex" gap={2} mb={1}>
-                      {/* ADDRESS */}
-                      <Box
-                        sx={{
-                          width: "50%",
-                          p: "10px 40px 10px 12px",
-                          pr: isEditing ? "70px" : "40px",
-                          backgroundColor: isEditing ? "#eef2ff" : "#f6f8fc",
-                          borderRadius: "8px",
-                          fontSize: 12,
-                          position: "relative",
-                          border: isEditing
-                            ? "1px solid #8da2fb"
-                            : "1px solid transparent",
-                          transition: "all 0.2s ease",
-                        }}
-                      >
-                        {isEditing ? (
-                          <TextField
-                            variant="standard"
-                            fullWidth
-                            value={editing.value}
-                            onChange={(e) =>
-                              setEditing({ ...editing, value: e.target.value })
-                            }
-                            InputProps={{
-                              disableUnderline: true,
-                              sx: { fontSize: 12 },
+                      return (
+                        <Box key={index} display="flex" gap={2} mb={1}>
+                          {/* ADDRESS */}
+                          <Box
+                            sx={{
+                              width: "50%",
+                              p: "10px 40px 10px 12px",
+                              pr: isEditing ? "70px" : "40px",
+                              backgroundColor: isEditing
+                                ? "#eef2ff"
+                                : "#f6f8fc",
+                              borderRadius: "8px",
+                              fontSize: 12,
+                              position: "relative",
+                              border: isEditing
+                                ? "1px solid #8da2fb"
+                                : "1px solid transparent",
+                              transition: "all 0.2s ease",
                             }}
-                            autoFocus
-                          />
-                        ) : (
-                          <Typography fontSize={12}>
-                            {buildAddressString(item)}
-                          </Typography>
-                        )}
-
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            right: 6,
-                            top: "50%",
-                            transform: "translateY(-50%)",
-                            display: "flex",
-                            gap: 0.5,
-                          }}
-                        >
-                          {isEditing ? (
-                            <>
-                              <IconButton
-                                size="small"
-                                onClick={() => {
-                                  handleAddressEdit(
-                                    index,
-                                    editing.value,
-                                    "DROP"
-                                  );
+                          >
+                            {isEditing ? (
+                              <TextField
+                                variant="standard"
+                                fullWidth
+                                value={editing.value}
+                                onChange={(e) =>
                                   setEditing({
-                                    type: null,
-                                    index: null,
-                                    value: "",
-                                  });
-                                }}
-                              >
-                                ✔
-                              </IconButton>
-
-                              <IconButton
-                                size="small"
-                                onClick={() =>
-                                  setEditing({
-                                    type: null,
-                                    index: null,
-                                    value: "",
+                                    ...editing,
+                                    value: e.target.value,
                                   })
                                 }
-                              >
-                                ✖
-                              </IconButton>
-                            </>
-                          ) : (
-                            <IconButton
-                              size="small"
-                              onClick={() =>
-                                setEditing({
-                                  type: "DROP",
-                                  index,
-                                  value: buildAddressString(item),
-                                })
-                              }
-                            >
-                              ✏️
-                            </IconButton>
-                          )}
-                        </Box>
-                      </Box>
+                                InputProps={{
+                                  disableUnderline: true,
+                                  sx: { fontSize: 12 },
+                                }}
+                                autoFocus
+                              />
+                            ) : (
+                              <Typography fontSize={12}>
+                                {buildAddressString(item)}
+                              </Typography>
+                            )}
 
-                      {/* COORDINATES */}
-                      <Box
-                        sx={{
-                          width: "50%",
-                          p: 1,
-                          background: "#eef4ff",
-                          borderRadius: 1,
-                          fontSize: 12,
-                        }}
-                      >
-                        Lat: <b>{item.latitude ?? "--"}</b> | Lon:{" "}
-                        <b>{item.longitude ?? "--"}</b>
-                      </Box>
-                    </Box>
-                  );
-                })}
+                            <Box
+                              sx={{
+                                position: "absolute",
+                                right: 6,
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                                display: "flex",
+                                gap: 0.5,
+                              }}
+                            >
+                              {isEditing ? (
+                                <>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => {
+                                      handleAddressEdit(
+                                        index,
+                                        editing.value,
+                                        "DROP"
+                                      );
+                                      setEditing({
+                                        type: null,
+                                        index: null,
+                                        value: "",
+                                      });
+                                    }}
+                                  >
+                                    ✔
+                                  </IconButton>
+
+                                  <IconButton
+                                    size="small"
+                                    onClick={() =>
+                                      setEditing({
+                                        type: null,
+                                        index: null,
+                                        value: "",
+                                      })
+                                    }
+                                  >
+                                    ✖
+                                  </IconButton>
+                                </>
+                              ) : (
+                                <IconButton
+                                  size="small"
+                                  onClick={() =>
+                                    setEditing({
+                                      type: "DROP",
+                                      index,
+                                      value: buildAddressString(item),
+                                    })
+                                  }
+                                >
+                                  ✏️
+                                </IconButton>
+                              )}
+                            </Box>
+                          </Box>
+
+                          {/* COORDINATES */}
+                          <Box
+                            sx={{
+                              width: "50%",
+                              p: 1,
+                              background: "#eef4ff",
+                              borderRadius: 1,
+                              fontSize: 12,
+                            }}
+                          >
+                            Lat: <b>{item.latitude ?? "--"}</b> | Lon:{" "}
+                            <b>{item.longitude ?? "--"}</b>
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                  </>
+                )}
               </CardContent>
             </Card>
 
@@ -513,122 +534,138 @@ export default function GeoMappingTab() {
                   )}
                 </Box>
 
-                {filteredFsl.map((item, index) => {
-                  const isEditing =
-                    editing.type === "FSL" && editing.index === index;
+                {fromLocationsResponseLoading ? (
+                  Array.from({ length: 5 }).map((_, idx) => (
+                    <Box key={idx} display="flex" gap={2} mb={1}>
+                      <Skeleton variant="rectangular" width="50%" height={40} />
+                      <Skeleton variant="rectangular" width="50%" height={40} />
+                    </Box>
+                  ))
+                ) : (
+                  <>
+                    {filteredFsl.map((item, index) => {
+                      const isEditing =
+                        editing.type === "FSL" && editing.index === index;
 
-                  return (
-                    <Box key={index} display="flex" gap={2} mb={1}>
-                      <Box
-                        sx={{
-                          width: "50%",
-                          p: "10px 40px 10px 12px",
-                          pr: isEditing ? "70px" : "40px",
-                          backgroundColor: isEditing ? "#eef2ff" : "#f6f8fc",
-                          borderRadius: "8px",
-                          fontSize: 12,
-                          position: "relative",
-                          border: isEditing
-                            ? "1px solid #8da2fb"
-                            : "1px solid transparent",
-                          transition: "all 0.2s ease",
-                        }}
-                      >
-                        {isEditing ? (
-                          <TextField
-                            variant="standard"
-                            fullWidth
-                            value={editing.value}
-                            onChange={(e) =>
-                              setEditing({ ...editing, value: e.target.value })
-                            }
-                            InputProps={{
-                              disableUnderline: true,
-                              sx: { fontSize: 12 },
+                      return (
+                        <Box key={index} display="flex" gap={2} mb={1}>
+                          <Box
+                            sx={{
+                              width: "50%",
+                              p: "10px 40px 10px 12px",
+                              pr: isEditing ? "70px" : "40px",
+                              backgroundColor: isEditing
+                                ? "#eef2ff"
+                                : "#f6f8fc",
+                              borderRadius: "8px",
+                              fontSize: 12,
+                              position: "relative",
+                              border: isEditing
+                                ? "1px solid #8da2fb"
+                                : "1px solid transparent",
+                              transition: "all 0.2s ease",
                             }}
-                            autoFocus
-                          />
-                        ) : (
-                          <Typography fontSize={12}>
-                            {buildAddressString(item)}
-                          </Typography>
-                        )}
-
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            right: 6,
-                            top: "50%",
-                            transform: "translateY(-50%)",
-                            display: "flex",
-                            gap: 0.5,
-                          }}
-                        >
-                          {isEditing ? (
-                            <>
-                              <IconButton
-                                size="small"
-                                onClick={() => {
-                                  handleAddressEdit(
-                                    index,
-                                    editing.value,
-                                    "FSL"
-                                  );
+                          >
+                            {isEditing ? (
+                              <TextField
+                                variant="standard"
+                                fullWidth
+                                value={editing.value}
+                                onChange={(e) =>
                                   setEditing({
-                                    type: null,
-                                    index: null,
-                                    value: "",
-                                  });
-                                }}
-                              >
-                                ✔
-                              </IconButton>
-
-                              <IconButton
-                                size="small"
-                                onClick={() =>
-                                  setEditing({
-                                    type: null,
-                                    index: null,
-                                    value: "",
+                                    ...editing,
+                                    value: e.target.value,
                                   })
                                 }
-                              >
-                                ✖
-                              </IconButton>
-                            </>
-                          ) : (
-                            <IconButton
-                              size="small"
-                              onClick={() =>
-                                setEditing({
-                                  type: "FSL",
-                                  index,
-                                  value: buildAddressString(item),
-                                })
-                              }
-                            >
-                              ✏️
-                            </IconButton>
-                          )}
-                        </Box>
-                      </Box>
+                                InputProps={{
+                                  disableUnderline: true,
+                                  sx: { fontSize: 12 },
+                                }}
+                                autoFocus
+                              />
+                            ) : (
+                              <Typography fontSize={12}>
+                                {buildAddressString(item)}
+                              </Typography>
+                            )}
 
-                      <Box
-                        sx={{
-                          width: "50%",
-                          p: 1,
-                          background: "#eef4ff",
-                          borderRadius: 1,
-                          fontSize: 12,
-                        }}
-                      >
-                        Lat: <b>{item.latitude ?? "--"}</b> | Lon:{" "}
-                        <b>{item.longitude ?? "--"}</b>
-                      </Box>
-                    </Box>
-                  );
-                })}
+                            <Box
+                              sx={{
+                                position: "absolute",
+                                right: 6,
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                                display: "flex",
+                                gap: 0.5,
+                              }}
+                            >
+                              {isEditing ? (
+                                <>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => {
+                                      handleAddressEdit(
+                                        index,
+                                        editing.value,
+                                        "FSL"
+                                      );
+                                      setEditing({
+                                        type: null,
+                                        index: null,
+                                        value: "",
+                                      });
+                                    }}
+                                  >
+                                    ✔
+                                  </IconButton>
+
+                                  <IconButton
+                                    size="small"
+                                    onClick={() =>
+                                      setEditing({
+                                        type: null,
+                                        index: null,
+                                        value: "",
+                                      })
+                                    }
+                                  >
+                                    ✖
+                                  </IconButton>
+                                </>
+                              ) : (
+                                <IconButton
+                                  size="small"
+                                  onClick={() =>
+                                    setEditing({
+                                      type: "FSL",
+                                      index,
+                                      value: buildAddressString(item),
+                                    })
+                                  }
+                                >
+                                  ✏️
+                                </IconButton>
+                              )}
+                            </Box>
+                          </Box>
+
+                          <Box
+                            sx={{
+                              width: "50%",
+                              p: 1,
+                              background: "#eef4ff",
+                              borderRadius: 1,
+                              fontSize: 12,
+                            }}
+                          >
+                            Lat: <b>{item.latitude ?? "--"}</b> | Lon:{" "}
+                            <b>{item.longitude ?? "--"}</b>
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                  </>
+                )}
               </CardContent>
             </Card>
           </Box>

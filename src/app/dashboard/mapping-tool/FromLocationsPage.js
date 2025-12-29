@@ -27,10 +27,15 @@ import ApartmentIcon from "@mui/icons-material/Apartment";
 import WarehouseIcon from "@mui/icons-material/Warehouse";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import UseGetFromLocations from "@/api/FromLocations/FromLocationLists";
-import { GET_FROMLOCATIONS, POST_FROMUPLOAD } from "@/constant";
+import {
+  GET_FROMLOCATIONS,
+  POST_FROMLOCATION_TEMPLATE_DOWNLOAD,
+  POST_FROMUPLOAD,
+} from "@/constant";
 import TableSkeleton from "@/app/components/TableSkeleton";
 import CommonSnackbar from "@/app/components/CommonSnackbar";
 import useFromLocationUpload from "@/api/FromLocations/FromUpload";
+import useExportDownload from "@/api/Download/DownLoadTemplates";
 
 export default function FromLocationTab() {
   const {
@@ -180,6 +185,40 @@ export default function FromLocationTab() {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const { exportDownloadData, exportDownloadResLoading } = useExportDownload();
+
+  const handleExportAll = async () => {
+    const columnHeaders = {
+      site_id: "Site ID",
+      street: "Street",
+      address: "Address",
+      city: "City",
+      state_prov: "State",
+      postal_code: "Postal Code",
+      country: "Country",
+    };
+
+    const data = [
+      {
+        site_id: "S12345",
+        street: "MG Road",
+        address: "Near Metro Station",
+        city: "Bengaluru",
+        state_prov: "Karnataka",
+        postal_code: "560001",
+        country: "India",
+      },
+    ];
+
+    const payload = {
+      attributes: columnHeaders,
+      data: data,
+      file_name: "From Location Template",
+    };
+    // console.log("payload", payload);
+    exportDownloadData(POST_FROMLOCATION_TEMPLATE_DOWNLOAD, payload);
   };
 
   return (
@@ -350,17 +389,29 @@ export default function FromLocationTab() {
                       className="btn-primary"
                       variant="contained"
                       component="label"
-                      startIcon={<CloudDownloadIcon />}
+                      onClick={handleExportAll}
+                      disabled={exportDownloadResLoading}
+                      startIcon={
+                        <CloudDownloadIcon
+                          sx={{
+                            animation: exportDownloadResLoading
+                              ? "pulse 1.2s ease-in-out infinite"
+                              : "none",
+                          }}
+                        />
+                      }
                       sx={{
-                        // backgroundColor: "#dce6f7",
-                        // color: "#0b2a55",
-                        // "&:hover": { backgroundColor: "#c9d8ef" },
                         textTransform: "none",
-                        // fontWeight: 600,
+                        "@keyframes pulse": {
+                          "0%": { opacity: 0.4 },
+                          "50%": { opacity: 1 },
+                          "100%": { opacity: 0.4 },
+                        },
                       }}
                     >
-                      Download Excel
-                      <input type="file" hidden />
+                      {exportDownloadResLoading
+                        ? "Downloading…"
+                        : "Download Template"}
                     </Button>
 
                     <Button

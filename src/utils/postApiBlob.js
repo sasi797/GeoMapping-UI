@@ -2,7 +2,7 @@ import { ApiError } from "./postApiMethod";
 
 const postApiBlob = async (url, payload) => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const token = sessionStorage.getItem("verifyotp-jwt-token");
+  const token = sessionStorage.getItem("authtoken");
   const fullUrl = `${baseUrl}/${url}`;
 
   const isFormData = payload instanceof FormData;

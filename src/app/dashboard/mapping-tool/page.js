@@ -82,7 +82,11 @@ export default function MappingScreen() {
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      sessionStorage.clear();
+      // sessionStorage.clear();
+      sessionStorage.removeItem("hasToLocations");
+      sessionStorage.removeItem("hasFromLocations");
+      sessionStorage.removeItem("geoErrorState");
+      sessionStorage.setItem("isRefreshing", "true");
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
