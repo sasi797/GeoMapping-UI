@@ -25,6 +25,9 @@ import {
   GroupOutlined,
 } from "@mui/icons-material";
 
+import fullLogo from "../../assests/splfull-logo.png";
+import Image from "next/image";
+
 const drawerWidth = 220;
 
 const topMenus = [];
@@ -302,18 +305,16 @@ export default function DashboardLayout({ children }) {
           ))}
         </Box>
 
-        {/* Footer */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", p: 1 }}>
-          <Tooltip title="Help">
-            <IconButton>
-              <HelpIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Settings">
-            <IconButton>
-              <SettingsIcon />
-            </IconButton>
-          </Tooltip>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            p: 2,
+            backgroundColor: "#f5f5f5", // Slight grey background
+          }}
+        >
+          <Image src={fullLogo} alt="Full Logo" height={40} />
         </Box>
       </Box>
 

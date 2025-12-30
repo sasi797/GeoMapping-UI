@@ -110,7 +110,12 @@ const CustomTable = ({ columns, data, actions, height }) => {
           }}
         />
       </Box>
-      <TableContainer sx={{ maxHeight: height }}>
+      <TableContainer
+        sx={{
+          height: height,
+          overflowY: "auto",
+        }}
+      >
         <Table size="small" stickyHeader>
           <TableHead>
             <TableRow>

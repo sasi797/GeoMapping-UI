@@ -16,6 +16,9 @@ import { MdLock } from "react-icons/md";
 import useLogin from "@/api/login/Login";
 import CommonSnackbar from "@/app/components/CommonSnackbar";
 import { SIGN_IN } from "@/constant";
+import Image from "next/image";
+import fullLogo from "../../../assests/splfull-logo.png";
+
 // import { MdHelpOutline, MdPersonAdd } from "react-icons/md";
 
 const SignIn = () => {
@@ -148,9 +151,19 @@ const SignIn = () => {
 
       {/* CARD */}
       <Box component="form" className="signin-card">
-        <Typography align="center" className="signin-title">
-          {header[view]}
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Image
+            src={fullLogo}
+            alt="Full Logo"
+            style={{ width: "80%", height: "auto", maxWidth: "800px" }}
+          />
+        </Box>
 
         {/* ---------- SIGN IN ---------- */}
         {view === "signin" && (

@@ -264,7 +264,7 @@ export default function GeoMappingTab() {
                   }}
                 >
                   <Typography fontWeight="bold" color="#555">
-                    Drop Location → Coordinates
+                    To Locations → Coordinates
                   </Typography>
 
                   <Box
@@ -474,7 +474,7 @@ export default function GeoMappingTab() {
                   }}
                 >
                   <Typography fontWeight="bold" color="#555">
-                    FSL Location → Coordinates
+                    From Locations → Coordinates
                   </Typography>
 
                   <Box

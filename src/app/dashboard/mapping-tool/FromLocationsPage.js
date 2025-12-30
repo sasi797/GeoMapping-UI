@@ -381,12 +381,12 @@ export default function FromLocationTab() {
                     variant="body2"
                     sx={{ color: "#666", fontWeight: 500 }}
                   >
-                    Upload Excel (.xlsx) To Preview FSL Locations
+                    Upload Excel (.xlsx) for Map From Locations
                   </Typography>
 
                   <Stack direction="row" spacing={1}>
                     <Button
-                      className="btn-primary"
+                      className="btn-secondary"
                       variant="contained"
                       component="label"
                       onClick={handleExportAll}
