@@ -25,7 +25,14 @@ import useUpdateGeoCode from "@/api/GeoCoding/PutGeoCode";
    HELPER FUNCTIONS
 ======================== */
 const buildAddressString = (item) =>
-  [item.street, item.city, item.state_prov, item.postal_code, item.country]
+  [
+    item.site_id,
+    item.street,
+    item.city,
+    item.state_prov,
+    item.postal_code,
+    item.country,
+  ]
     .filter(Boolean)
     .join(", ");
 
@@ -189,7 +196,7 @@ export default function GeoMappingTab() {
         type: "depot_locations",
         data: [editedRecord],
       };
-      console.log("DROP payload (edited row only):", payload);
+      // console.log("DROP payload (edited row only):", payload);
       updateGeoCode(PUT_GEO_CODE_UPDATE, payload);
     }
 
@@ -208,16 +215,16 @@ export default function GeoMappingTab() {
         type: "fsl_locations",
         data: [editedRecord],
       };
-      console.log("FSL payload (edited row only):", payload);
+      // console.log("FSL payload (edited row only):", payload);
       // PUT_GEO_CODE_UPDATE
       updateGeoCode(PUT_GEO_CODE_UPDATE, payload);
     }
   };
 
   useEffect(() => {
-    console.log("updateGeoCodeResponse", updateGeoCodeResponse);
+    // console.log("updateGeoCodeResponse", updateGeoCodeResponse);
     if (updateGeoCodeResponse?.statusCode === 200) {
-      console.log("updateGeoCodeResponsewwwww", updateGeoCodeResponse);
+      // console.log("updateGeoCodeResponsewwwww", updateGeoCodeResponse);
       getToLocations(GET_TOLOCATIONS);
       getFromLocations(GET_FROMLOCATIONS);
       // setFromLocationApiData(fromLocationsResponse?.data?.rows);
@@ -264,7 +271,7 @@ export default function GeoMappingTab() {
                   }}
                 >
                   <Typography fontWeight="bold" color="#555">
-                    To Locations → Coordinates
+                    Map To Locations → Coordinates
                   </Typography>
 
                   <Box
@@ -374,8 +381,13 @@ export default function GeoMappingTab() {
                                 autoFocus
                               />
                             ) : (
+                              // <Typography fontSize={12}>
+                              //   {buildAddressString(item)}
+                              // </Typography>
                               <Typography fontSize={12}>
-                                {buildAddressString(item)}
+                                <strong>{item.site_id}</strong>
+                                <br />
+                                {buildAddressString({ ...item, site_id: null })}
                               </Typography>
                             )}
 
@@ -474,7 +486,7 @@ export default function GeoMappingTab() {
                   }}
                 >
                   <Typography fontWeight="bold" color="#555">
-                    From Locations → Coordinates
+                    Map From Locations → Coordinates
                   </Typography>
 
                   <Box
@@ -584,8 +596,13 @@ export default function GeoMappingTab() {
                                 autoFocus
                               />
                             ) : (
+                              // <Typography fontSize={12}>
+                              //   {buildAddressString(item)}
+                              // </Typography>
                               <Typography fontSize={12}>
-                                {buildAddressString(item)}
+                                <strong>{item.site_id}</strong>
+                                <br />
+                                {buildAddressString({ ...item, site_id: null })}
                               </Typography>
                             )}
 

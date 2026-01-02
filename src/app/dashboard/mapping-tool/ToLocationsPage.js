@@ -132,7 +132,7 @@ export default function ToLocationTab() {
 
   useEffect(() => {
     if (toLocationUploadResponse?.statusCode === 200) {
-      console.log("toLocationUploadResponse", toLocationUploadResponse);
+      // console.log("toLocationUploadResponse", toLocationUploadResponse);
       getToLocations(GET_TOLOCATIONS);
       // sessionStorage.setItem("hasToLocations", "true");
     } else {
@@ -250,15 +250,15 @@ export default function ToLocationTab() {
                     type="file"
                     hidden
                     accept=".xlsx,.xls"
-                    onChange={handleExcelUpload} // 👈 attach handler
+                    onChange={handleExcelUpload}
                   />
                 </Button>
               </Stack>
             </Box>
 
-            <Box mt={1} sx={{ maxHeight: "65vh", overflow: "auto" }}>
+            <Box mt={1}>
               <Typography mb={1} fontWeight="600" sx={{ color: "#555555" }}>
-                Drop Location List
+                Map to Locations list
               </Typography>
 
               <>
@@ -267,10 +267,10 @@ export default function ToLocationTab() {
                   <TableSkeleton columns={toLocationColumns} rowCount={5} />
                 ) : (
                   <CustomTable
-                    height={250}
                     columns={toLocationColumns}
                     data={toLocationApiData ?? []}
-                    emptyText="No Drop Location available."
+                    emptyText="No Map to Locations list available."
+                    maxHeight="calc(100vh - 260px)"
                   />
                 )}
               </>

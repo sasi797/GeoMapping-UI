@@ -21,9 +21,11 @@ import LocalShipping from "@mui/icons-material/LocalShipping";
 import UseGetMapping from "@/api/Mapping/MappingList";
 import { GET_LOCATION_MAPPING, POST_MAPPING_DOWNLOAD } from "@/constant";
 import useExportDownload from "@/api/Download/DownLoadTemplates";
+import SkeletonRow from "@/app/components/SkeletonRow";
 
 export default function MappingTab() {
-  const { getMapping, mappingResponse } = UseGetMapping();
+  const { getMapping, mappingResponse, mappingResponseLoading } =
+    UseGetMapping();
   const [mappingApiData, setMappingApiData] = useState([]);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export default function MappingTab() {
 
   useEffect(() => {
     if (mappingResponse?.statusCode === 200) {
-      console.log("mappingResponse", mappingResponse);
+      // console.log("mappingResponse", mappingResponse);
       setMappingApiData(mappingResponse?.data?.rows);
     }
   }, [mappingResponse]);
@@ -146,7 +148,9 @@ export default function MappingTab() {
                       },
                     }}
                   >
-                    {exportDownloadResLoading ? "Downloading…" : "Download"}
+                    {exportDownloadResLoading
+                      ? "Downloading…"
+                      : "Download Report"}
                   </Button>
                 </Box>
               </Box>
@@ -206,58 +210,71 @@ export default function MappingTab() {
                   </TableHead>
 
                   <TableBody>
-                    {mappingApiData.map((row) => {
-                      const warehouses = buildWarehouses(row);
+                    {mappingResponseLoading ? (
+                      <>
+                        <SkeletonRow />
+                        <SkeletonRow />
+                        <SkeletonRow />
+                        <SkeletonRow />
+                        <SkeletonRow />
+                      </>
+                    ) : (
+                      mappingApiData.map((row, index) => {
+                        const warehouses = buildWarehouses(row);
 
-                      return (
-                        <TableRow key={`${row.site_id}-${row.id}`}>
-                          {/* SITE ID */}
-                          <TableCell>{row.site_id}</TableCell>
+                        return (
+                          <TableRow key={index}>
+                            {/* SITE ID */}
+                            <TableCell>{row.site_id}</TableCell>
 
-                          {/* ADDRESS */}
-                          <TableCell>
-                            <Typography fontWeight={600}>
-                              {row.address}
-                            </Typography>
-                          </TableCell>
-
-                          {/* TOP 3 NEAREST */}
-                          {warehouses.map((w, idx) => (
-                            <TableCell key={idx} sx={{ verticalAlign: "top" }}>
-                              {w.siteId ? (
-                                <>
-                                  <Typography fontWeight={600}>
-                                    {w.siteId}
-                                  </Typography>
-
-                                  <Typography variant="body2">
-                                    {w.address}
-                                  </Typography>
-
-                                  <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                  >
-                                    Distance: {w.distance ?? "--"} km
-                                  </Typography>
-
-                                  <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                  >
-                                    Duration: {w.time ?? "--"} hrs
-                                  </Typography>
-                                </>
-                              ) : (
-                                <Typography color="text.secondary">
-                                  No warehouse
-                                </Typography>
-                              )}
+                            {/* ADDRESS */}
+                            <TableCell>
+                              <Typography fontWeight={600}>
+                                {row.address}
+                              </Typography>
                             </TableCell>
-                          ))}
-                        </TableRow>
-                      );
-                    })}
+
+                            {/* TOP 3 NEAREST */}
+                            {warehouses.map((w, idx) => (
+                              <TableCell
+                                key={idx}
+                                sx={{ verticalAlign: "top" }}
+                              >
+                                {w.siteId ? (
+                                  <>
+                                    <Typography fontWeight={600}>
+                                      {w.siteId}
+                                    </Typography>
+
+                                    <Typography variant="body2">
+                                      {w.address}
+                                    </Typography>
+
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                    >
+                                      Distance: {w.distance ?? "--"} km
+                                    </Typography>
+
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                    >
+                                      Duration: {w.time ?? "--"} hrs
+                                    </Typography>
+                                  </>
+                                ) : (
+                                  <Typography color="text.secondary">
+                                    No warehouse
+                                  </Typography>
+                                )}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        );
+                      })
+                    )}
                   </TableBody>
                 </Table>
               </TableContainer>

@@ -21,7 +21,7 @@ const UseGetToLocations = () => {
       const response = await getApi(url);
 
       if (response?.statusCode === 200) {
-        console.log("response", response);
+        // console.log("response", response);
         setToLocationsResponse(response);
         setSnackbarGetToLocation({
           open: true,

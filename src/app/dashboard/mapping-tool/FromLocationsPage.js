@@ -145,7 +145,7 @@ export default function FromLocationTab() {
 
   useEffect(() => {
     if (fromLocationUploadResponse?.statusCode === 200) {
-      console.log("fromLocationUploadResponse", fromLocationUploadResponse);
+      // console.log("fromLocationUploadResponse", fromLocationUploadResponse);
       getFromLocations(GET_FROMLOCATIONS);
     } else {
       console.log("API Failed");
@@ -432,15 +432,15 @@ export default function FromLocationTab() {
                         type="file"
                         hidden
                         accept=".xlsx,.xls"
-                        onChange={handleExcelUpload} // 👈 attach handler
+                        onChange={handleExcelUpload}
                       />
                     </Button>
                   </Stack>
                 </Box>
 
-                <Box mt={1} sx={{ maxHeight: "55vh", overflow: "auto" }}>
+                <Box mt={1}>
                   <Typography mb={1} fontWeight="600" sx={{ color: "#555555" }}>
-                    FSL Location List
+                    Map from Locations list
                   </Typography>
 
                   <>
@@ -452,10 +452,10 @@ export default function FromLocationTab() {
                       />
                     ) : (
                       <CustomTable
-                        height={190}
                         columns={fromLocationColumns}
                         data={fromLocationApiData ?? []}
-                        emptyText="No FSL Location available."
+                        emptyText="No Map from Location list available."
+                        maxHeight="calc(90vh - 260px)"
                       />
                     )}
                   </>

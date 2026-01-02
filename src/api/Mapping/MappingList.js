@@ -20,7 +20,7 @@ const UseGetMapping = () => {
       const response = await getApi(url);
 
       if (response?.statusCode === 200) {
-        console.log("response", response);
+        // console.log("response", response);
         setMappingResponse(response);
         setSnackbarGetFromMapping({
           open: true,
