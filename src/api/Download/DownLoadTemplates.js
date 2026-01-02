@@ -55,7 +55,7 @@ const useExportDownload = () => {
 
       setSnackbarDownloadTemplate({
         open: true,
-        message: "Template downloaded successfully",
+        message: "Downloaded successfully",
         severity: "success",
       });
     } catch (error) {
