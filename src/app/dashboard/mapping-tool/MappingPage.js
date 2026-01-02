@@ -129,13 +129,16 @@ export default function MappingTab() {
                     variant="contained"
                     component="label"
                     onClick={handleExportAll}
-                    disabled={exportDownloadResLoading}
+                    disabled={
+                      exportDownloadResLoading || mappingResponseLoading
+                    }
                     startIcon={
                       <CloudDownloadIcon
                         sx={{
-                          animation: exportDownloadResLoading
-                            ? "pulse 1.2s ease-in-out infinite"
-                            : "none",
+                          animation:
+                            exportDownloadResLoading || mappingResponseLoading
+                              ? "pulse 1.2s ease-in-out infinite"
+                              : "none",
                         }}
                       />
                     }
