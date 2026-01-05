@@ -308,13 +308,13 @@ export default function DashboardLayout({ children }) {
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "center",
             alignItems: "center",
-            p: 2,
-            backgroundColor: "#f5f5f5", // Slight grey background
+            p: 1,
+            backgroundColor: "#f5f5f5",
           }}
         >
-          <Image src={fullLogo} alt="Full Logo" height={40} />
+          <Image src={fullLogo} alt="Full Logo" height={55} />
         </Box>
       </Box>
 

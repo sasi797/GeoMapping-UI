@@ -259,7 +259,7 @@ export default function GeoMappingTab() {
           <Box display="flex" gap={2}>
             {/* ================= DROP LOCATION ================= */}
             <Card
-              sx={{ flex: 1, minWidth: 0, maxHeight: "75vh", overflow: "auto" }}
+              sx={{ flex: 1, minWidth: 0, maxHeight: "77vh", overflow: "auto" }}
             >
               <CardContent>
                 <Box
@@ -474,7 +474,7 @@ export default function GeoMappingTab() {
 
             {/* ================= FSL LOCATION ================= */}
             <Card
-              sx={{ flex: 1, minWidth: 0, maxHeight: "75vh", overflow: "auto" }}
+              sx={{ flex: 1, minWidth: 0, maxHeight: "77vh", overflow: "auto" }}
             >
               <CardContent>
                 <Box

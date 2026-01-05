@@ -158,7 +158,7 @@ export default function MappingTab() {
                 </Box>
               </Box>
 
-              <TableContainer sx={{ maxHeight: 400 }}>
+              <TableContainer sx={{ maxHeight: "70vh", overflow: "auto" }}>
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow>
