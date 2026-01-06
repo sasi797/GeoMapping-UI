@@ -154,7 +154,6 @@ export default function ToLocationTab() {
     const columnHeaders = {
       site_id: "Site ID",
       street: "Street",
-      address: "Address",
       city: "City",
       state_prov: "State",
       postal_code: "Postal Code",
@@ -165,7 +164,6 @@ export default function ToLocationTab() {
       {
         site_id: "S12345",
         street: "MG Road",
-        address: "Near Metro Station",
         city: "Bengaluru",
         state_prov: "Karnataka",
         postal_code: "560001",
