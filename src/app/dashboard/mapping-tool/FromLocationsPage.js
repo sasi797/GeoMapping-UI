@@ -225,7 +225,7 @@ export default function FromLocationTab() {
         <AnimatePresence mode="wait">
           <motion.div key="tab2" {...tabAnim}>
             {/* ------- TOP TOGGLE BUTTONS ------- */}
-            <Box
+            {/* <Box
               sx={{
                 display: "inline-flex",
                 background: "#e9edf7",
@@ -234,7 +234,6 @@ export default function FromLocationTab() {
                 mb: 3,
               }}
             >
-              {/* Select Warehouses */}
               <Button
                 onClick={() => setMode("warehouse")}
                 startIcon={<WarehouseIcon sx={{ fontSize: 16 }} />}
@@ -259,7 +258,6 @@ export default function FromLocationTab() {
                 Warehouse
               </Button>
 
-              {/* Upload Excel */}
               <Button
                 onClick={() => setMode("upload")}
                 startIcon={<CloudUploadIcon sx={{ fontSize: 16 }} />}
@@ -283,7 +281,7 @@ export default function FromLocationTab() {
               >
                 Upload
               </Button>
-            </Box>
+            </Box> */}
 
             {/* ---------------- TAB 1 – Upload Excel ---------------- */}
             {mode === "warehouse" && (
@@ -453,7 +451,7 @@ export default function FromLocationTab() {
                         columns={fromLocationColumns}
                         data={fromLocationApiData ?? []}
                         emptyText="No Map from Location list available."
-                        maxHeight="calc(90vh - 260px)"
+                        maxHeight="calc(100vh - 260px)"
                       />
                     )}
                   </>

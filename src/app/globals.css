@@ -233,7 +233,7 @@ select {
   font-weight: 600;
   padding: 4px 12px !important;
   text-transform: none;
-  border: 1.5px solid transparent !important; /* needed for gradient border */
+  /* border: 1.5px solid transparent !important; */
   border-radius: 6px !important;
   transition: all 0.2s ease;
 }

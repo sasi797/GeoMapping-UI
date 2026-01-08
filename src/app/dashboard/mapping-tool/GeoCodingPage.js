@@ -8,10 +8,18 @@ import {
   TextField,
   IconButton,
   Skeleton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Grid,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
 import ClearIcon from "@mui/icons-material/Clear";
+import EditIcon from "@mui/icons-material/Edit";
+
 import {
   GET_FROMLOCATIONS,
   GET_TOLOCATIONS,
@@ -22,66 +30,150 @@ import UseGetFromLocations from "@/api/FromLocations/FromLocationLists";
 import useUpdateGeoCode from "@/api/GeoCoding/PutGeoCode";
 
 /* ========================
-   HELPER FUNCTIONS
+   HELPERS
 ======================== */
 const buildAddressString = (item) =>
-  [
-    item.site_id,
-    item.street,
-    item.city,
-    item.state_prov,
-    item.postal_code,
-    item.country,
-  ]
+  [item.street, item.city, item.state_prov, item.postal_code, item.country]
     .filter(Boolean)
     .join(", ");
 
-const parseAddressString = (value) => {
-  const [street, city, state_prov, postal_code, country] = value
-    .split(",")
-    .map((v) => v.trim());
-  return {
-    street: street || "",
-    city: city || "",
-    state_prov: state_prov || "",
-    postal_code: postal_code || "",
-    country: country || "",
-  };
-};
-
 export default function GeoMappingTab() {
-  const [editing, setEditing] = useState({
-    type: null, // "DROP" | "FSL"
-    index: null,
-    value: "",
+  /* ========================
+     EDIT DIALOG STATE
+  ======================== */
+  const [editDialog, setEditDialog] = useState({
+    open: false,
+    type: null, // DROP | FSL
+    record: null,
   });
 
-  const {
-    updateGeoCode,
-    updateGeoCodeResponse,
-    updateGeoCodeResponseLoading,
-    snackbarUpdateGeoCode,
-    setSnackbarUpdateGeoCode,
-  } = useUpdateGeoCode();
+  const openEditDialog = (type, record) => {
+    console.log("record", record);
+    setEditDialog({
+      open: true,
+      type,
+      record: { ...record }, // clone
+    });
+  };
 
-  /* ---------------- DROP LOCATIONS ---------------- */
+  const closeEditDialog = () => {
+    setEditDialog({ open: false, type: null, record: null });
+  };
+
+  /* ========================
+     UPDATE API
+  ======================== */
+  const { updateGeoCode, updateGeoCodeResponse, updateGeoCodeResponseLoading } =
+    useUpdateGeoCode();
+
+  const handleSave = () => {
+    const payload = {
+      type: editDialog.type === "DROP" ? "depot_locations" : "fsl_locations",
+      data: [editDialog.record],
+    };
+
+    updateGeoCode(PUT_GEO_CODE_UPDATE, payload);
+    closeEditDialog();
+  };
+
+  /* ========================
+     DROP LOCATIONS
+  ======================== */
   const { getToLocations, toLocationsResponse, toLocationsResponseLoading } =
     UseGetToLocations();
+
   const [toLocationApiData, setToLocationApiData] = useState([]);
   const [dropSearch, setDropSearch] = useState("");
   const [filteredDrop, setFilteredDrop] = useState([]);
 
   useEffect(() => {
     getToLocations(GET_TOLOCATIONS);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (toLocationsResponse?.statusCode === 200) {
-      setToLocationApiData(toLocationsResponse?.data?.rows || []);
-      setFilteredDrop(toLocationsResponse?.data?.rows || []);
+      setToLocationApiData(toLocationsResponse.data.rows || []);
+      setFilteredDrop(toLocationsResponse.data.rows || []);
     }
   }, [toLocationsResponse]);
+
+  const handleDropSearch = (value) => {
+    setDropSearch(value);
+    if (!value.trim()) return setFilteredDrop(toLocationApiData);
+
+    const lower = value.toLowerCase();
+    setFilteredDrop(
+      toLocationApiData.filter(
+        (item) =>
+          item.street?.toLowerCase().includes(lower) ||
+          item.city?.toLowerCase().includes(lower) ||
+          item.state_prov?.toLowerCase().includes(lower) ||
+          item.postal_code?.includes(value) ||
+          item.country?.toLowerCase().includes(lower)
+      )
+    );
+  };
+
+  const clearDropSearch = () => {
+    setDropSearch("");
+    setFilteredDrop(toLocationApiData);
+  };
+
+  /* ========================
+     FSL LOCATIONS
+  ======================== */
+  const {
+    getFromLocations,
+    fromLocationsResponse,
+    fromLocationsResponseLoading,
+  } = UseGetFromLocations();
+
+  const [fromLocationApiData, setFromLocationApiData] = useState([]);
+  const [fslSearch, setFslSearch] = useState("");
+  const [filteredFsl, setFilteredFsl] = useState([]);
+
+  useEffect(() => {
+    getFromLocations(GET_FROMLOCATIONS);
+  }, []);
+
+  useEffect(() => {
+    if (fromLocationsResponse?.statusCode === 200) {
+      setFromLocationApiData(fromLocationsResponse.data.rows || []);
+      setFilteredFsl(fromLocationsResponse.data.rows || []);
+    }
+  }, [fromLocationsResponse]);
+
+  const handleFslSearch = (value) => {
+    setFslSearch(value);
+    if (!value.trim()) return setFilteredFsl(fromLocationApiData);
+
+    const lower = value.toLowerCase();
+    setFilteredFsl(
+      fromLocationApiData.filter(
+        (item) =>
+          item.street?.toLowerCase().includes(lower) ||
+          item.city?.toLowerCase().includes(lower) ||
+          item.state_prov?.toLowerCase().includes(lower) ||
+          item.postal_code?.includes(value) ||
+          item.country?.toLowerCase().includes(lower)
+      )
+    );
+  };
+
+  const clearFslSearch = () => {
+    setFslSearch("");
+    setFilteredFsl(fromLocationApiData);
+  };
+
+  /* ========================
+     REFRESH AFTER UPDATE
+  ======================== */
+  useEffect(() => {
+    if (updateGeoCodeResponse?.statusCode === 200) {
+      getToLocations(GET_TOLOCATIONS);
+      getFromLocations(GET_FROMLOCATIONS);
+    }
+  }, [updateGeoCodeResponse]);
 
   const dropLocationErrorCount = filteredDrop.filter(
     (item) =>
@@ -93,54 +185,6 @@ export default function GeoMappingTab() {
       isNaN(Number(item.longitude))
   ).length;
 
-  const handleDropSearch = (value) => {
-    setDropSearch(value);
-    if (!value.trim()) {
-      setFilteredDrop(toLocationApiData);
-      return;
-    }
-    const lower = value.toLowerCase();
-    setFilteredDrop(
-      toLocationApiData.filter(
-        (item) =>
-          item.street?.toLowerCase().includes(lower) ||
-          item.city?.toLowerCase().includes(lower) ||
-          item.state_prov?.toLowerCase().includes(lower) ||
-          item.postal_code?.includes(value) ||
-          item.country?.toLowerCase().includes(lower) ||
-          String(item.latitude).includes(value) ||
-          String(item.longitude).includes(value)
-      )
-    );
-  };
-
-  const clearDropSearch = () => {
-    setDropSearch("");
-    setFilteredDrop(toLocationApiData);
-  };
-
-  /* ---------------- FSL LOCATIONS ---------------- */
-  const {
-    getFromLocations,
-    fromLocationsResponse,
-    fromLocationsResponseLoading,
-  } = UseGetFromLocations();
-  const [fromLocationApiData, setFromLocationApiData] = useState([]);
-  const [fslSearch, setFslSearch] = useState("");
-  const [filteredFsl, setFilteredFsl] = useState([]);
-
-  useEffect(() => {
-    getFromLocations(GET_FROMLOCATIONS);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (fromLocationsResponse?.statusCode === 200) {
-      setFromLocationApiData(fromLocationsResponse?.data?.rows || []);
-      setFilteredFsl(fromLocationsResponse?.data?.rows || []);
-    }
-  }, [fromLocationsResponse]);
-
   const fslLocationErrorCount = filteredFsl.filter(
     (item) =>
       item.latitude == null ||
@@ -150,97 +194,6 @@ export default function GeoMappingTab() {
       isNaN(Number(item.latitude)) ||
       isNaN(Number(item.longitude))
   ).length;
-
-  const handleFslSearch = (value) => {
-    setFslSearch(value);
-    if (!value.trim()) {
-      setFilteredFsl(fromLocationApiData);
-      return;
-    }
-    const lower = value.toLowerCase();
-    setFilteredFsl(
-      fromLocationApiData.filter(
-        (item) =>
-          item.street?.toLowerCase().includes(lower) ||
-          item.city?.toLowerCase().includes(lower) ||
-          item.state_prov?.toLowerCase().includes(lower) ||
-          item.postal_code?.includes(value) ||
-          item.country?.toLowerCase().includes(lower) ||
-          String(item.latitude).includes(value) ||
-          String(item.longitude).includes(value)
-      )
-    );
-  };
-
-  const clearFslSearch = () => {
-    setFslSearch("");
-    setFilteredFsl(fromLocationApiData);
-  };
-
-  /* ---------------- EDIT HANDLER ---------------- */
-  const handleAddressEdit = (index, newValue, type) => {
-    const parsed = parseAddressString(newValue);
-
-    if (type === "DROP") {
-      // Update state
-      setFilteredDrop((prev) =>
-        prev.map((item, i) => (i === index ? { ...item, ...parsed } : item))
-      );
-      setToLocationApiData((prev) =>
-        prev.map((item, i) => (i === index ? { ...item, ...parsed } : item))
-      );
-
-      // Only the edited record
-      const editedRecord = { ...toLocationApiData[index], ...parsed };
-      const payload = {
-        type: "depot_locations",
-        data: [editedRecord],
-      };
-      // console.log("DROP payload (edited row only):", payload);
-      updateGeoCode(PUT_GEO_CODE_UPDATE, payload);
-    }
-
-    if (type === "FSL") {
-      // Update state
-      setFilteredFsl((prev) =>
-        prev.map((item, i) => (i === index ? { ...item, ...parsed } : item))
-      );
-      setFromLocationApiData((prev) =>
-        prev.map((item, i) => (i === index ? { ...item, ...parsed } : item))
-      );
-
-      // Only the edited record
-      const editedRecord = { ...fromLocationApiData[index], ...parsed };
-      const payload = {
-        type: "fsl_locations",
-        data: [editedRecord],
-      };
-      // console.log("FSL payload (edited row only):", payload);
-      // PUT_GEO_CODE_UPDATE
-      updateGeoCode(PUT_GEO_CODE_UPDATE, payload);
-    }
-  };
-
-  useEffect(() => {
-    // console.log("updateGeoCodeResponse", updateGeoCodeResponse);
-    if (updateGeoCodeResponse?.statusCode === 200) {
-      // console.log("updateGeoCodeResponsewwwww", updateGeoCodeResponse);
-      getToLocations(GET_TOLOCATIONS);
-      getFromLocations(GET_FROMLOCATIONS);
-      // setFromLocationApiData(fromLocationsResponse?.data?.rows);
-    } else {
-      console.log("API Failed");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updateGeoCodeResponse]);
-
-  /* ---------------- ANIMATION ---------------- */
-  const tabAnim = {
-    initial: { opacity: 0, scale: 0.9, x: -20 },
-    animate: { opacity: 1, scale: 1, x: 0 },
-    exit: { opacity: 0, scale: 0.9, x: 20 },
-    transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] },
-  };
 
   useEffect(() => {
     const geoErrorState = {
@@ -255,12 +208,15 @@ export default function GeoMappingTab() {
   return (
     <Box sx={{ fontFamily: "Roboto, sans-serif" }}>
       <AnimatePresence mode="wait">
-        <motion.div key="tab3" {...tabAnim}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, x: -20 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          exit={{ opacity: 0, scale: 0.9, x: 20 }}
+          transition={{ duration: 0.6 }}
+        >
           <Box display="flex" gap={2}>
-            {/* ================= DROP LOCATION ================= */}
-            <Card
-              sx={{ flex: 1, minWidth: 0, maxHeight: "77vh", overflow: "auto" }}
-            >
+            {/* ================= DROP ================= */}
+            <Card sx={{ flex: 1, maxHeight: "77vh", overflow: "auto" }}>
               <CardContent>
                 <Box
                   sx={{
@@ -303,10 +259,10 @@ export default function GeoMappingTab() {
                 >
                   <TextField
                     variant="standard"
-                    placeholder="Search address, lat, or lon..."
+                    placeholder="Search..."
                     value={dropSearch}
                     onChange={(e) => handleDropSearch(e.target.value)}
-                    sx={{ width: 180 }}
+                    sx={{ mt: 1 }}
                     InputProps={{
                       endAdornment: dropSearch && (
                         <IconButton size="small" onClick={clearDropSearch}>
@@ -315,167 +271,63 @@ export default function GeoMappingTab() {
                       ),
                     }}
                   />
-
-                  {dropSearch && (
-                    <IconButton
-                      onClick={clearDropSearch}
-                      sx={{
-                        background: "#f3f3f3",
-                        borderRadius: 1,
-                        width: 28,
-                        height: 28,
-                      }}
-                    >
-                      <ClearAllIcon sx={{ fontSize: 16 }} />
-                    </IconButton>
-                  )}
                 </Box>
+
                 {toLocationsResponseLoading ? (
-                  Array.from({ length: 5 }).map((_, idx) => (
-                    <Box key={idx} display="flex" gap={2} mb={1}>
-                      <Skeleton variant="rectangular" width="50%" height={40} />
-                      <Skeleton variant="rectangular" width="50%" height={40} />
+                  <Skeleton height={40} />
+                ) : (
+                  filteredDrop.map((item, index) => (
+                    <Box key={index} display="flex" gap={2} mt={1}>
+                      <Box
+                        sx={{
+                          width: "50%",
+                          p: "10px 40px 10px 12px",
+                          backgroundColor: "#f6f8fc",
+                          borderRadius: "8px",
+                          fontSize: 12,
+                          position: "relative",
+                        }}
+                      >
+                        <Typography fontSize={12}>
+                          <strong>{item.site_id}</strong>
+                          <br />
+                          {buildAddressString(item)}
+                        </Typography>
+
+                        <IconButton
+                          size="small"
+                          sx={{
+                            position: "absolute",
+                            right: 6,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                          }}
+                          onClick={() => openEditDialog("DROP", item)}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          width: "50%",
+                          p: 1,
+                          background: "#eef4ff",
+                          borderRadius: 1,
+                          fontSize: 12,
+                        }}
+                      >
+                        Lat: <b>{item.latitude ?? "--"}</b> | Lon:{" "}
+                        <b>{item.longitude ?? "--"}</b>
+                      </Box>
                     </Box>
                   ))
-                ) : (
-                  <>
-                    {filteredDrop.map((item, index) => {
-                      const isEditing =
-                        editing.type === "DROP" && editing.index === index;
-
-                      return (
-                        <Box key={index} display="flex" gap={2} mb={1}>
-                          {/* ADDRESS */}
-                          <Box
-                            sx={{
-                              width: "50%",
-                              p: "10px 40px 10px 12px",
-                              pr: isEditing ? "70px" : "40px",
-                              backgroundColor: isEditing
-                                ? "#eef2ff"
-                                : "#f6f8fc",
-                              borderRadius: "8px",
-                              fontSize: 12,
-                              position: "relative",
-                              border: isEditing
-                                ? "1px solid #8da2fb"
-                                : "1px solid transparent",
-                              transition: "all 0.2s ease",
-                            }}
-                          >
-                            {isEditing ? (
-                              <TextField
-                                variant="standard"
-                                fullWidth
-                                value={editing.value}
-                                onChange={(e) =>
-                                  setEditing({
-                                    ...editing,
-                                    value: e.target.value,
-                                  })
-                                }
-                                InputProps={{
-                                  disableUnderline: true,
-                                  sx: { fontSize: 12 },
-                                }}
-                                autoFocus
-                              />
-                            ) : (
-                              // <Typography fontSize={12}>
-                              //   {buildAddressString(item)}
-                              // </Typography>
-                              <Typography fontSize={12}>
-                                <strong>{item.site_id}</strong>
-                                <br />
-                                {buildAddressString({ ...item, site_id: null })}
-                              </Typography>
-                            )}
-
-                            <Box
-                              sx={{
-                                position: "absolute",
-                                right: 6,
-                                top: "50%",
-                                transform: "translateY(-50%)",
-                                display: "flex",
-                                gap: 0.5,
-                              }}
-                            >
-                              {isEditing ? (
-                                <>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => {
-                                      handleAddressEdit(
-                                        index,
-                                        editing.value,
-                                        "DROP"
-                                      );
-                                      setEditing({
-                                        type: null,
-                                        index: null,
-                                        value: "",
-                                      });
-                                    }}
-                                  >
-                                    ✔
-                                  </IconButton>
-
-                                  <IconButton
-                                    size="small"
-                                    onClick={() =>
-                                      setEditing({
-                                        type: null,
-                                        index: null,
-                                        value: "",
-                                      })
-                                    }
-                                  >
-                                    ✖
-                                  </IconButton>
-                                </>
-                              ) : (
-                                <IconButton
-                                  size="small"
-                                  onClick={() =>
-                                    setEditing({
-                                      type: "DROP",
-                                      index,
-                                      value: buildAddressString(item),
-                                    })
-                                  }
-                                >
-                                  ✏️
-                                </IconButton>
-                              )}
-                            </Box>
-                          </Box>
-
-                          {/* COORDINATES */}
-                          <Box
-                            sx={{
-                              width: "50%",
-                              p: 1,
-                              background: "#eef4ff",
-                              borderRadius: 1,
-                              fontSize: 12,
-                            }}
-                          >
-                            Lat: <b>{item.latitude ?? "--"}</b> | Lon:{" "}
-                            <b>{item.longitude ?? "--"}</b>
-                          </Box>
-                        </Box>
-                      );
-                    })}
-                  </>
                 )}
               </CardContent>
             </Card>
 
-            {/* ================= FSL LOCATION ================= */}
-            <Card
-              sx={{ flex: 1, minWidth: 0, maxHeight: "77vh", overflow: "auto" }}
-            >
+            {/* ================= FSL ================= */}
+            <Card sx={{ flex: 1, maxHeight: "77vh", overflow: "auto" }}>
               <CardContent>
                 <Box
                   sx={{
@@ -518,10 +370,10 @@ export default function GeoMappingTab() {
                 >
                   <TextField
                     variant="standard"
-                    placeholder="Search address, lat, or lon..."
+                    placeholder="Search..."
                     value={fslSearch}
                     onChange={(e) => handleFslSearch(e.target.value)}
-                    sx={{ width: 180 }}
+                    sx={{ mt: 1 }}
                     InputProps={{
                       endAdornment: fslSearch && (
                         <IconButton size="small" onClick={clearFslSearch}>
@@ -530,164 +382,179 @@ export default function GeoMappingTab() {
                       ),
                     }}
                   />
-
-                  {fslSearch && (
-                    <IconButton
-                      onClick={clearFslSearch}
-                      sx={{
-                        background: "#f3f3f3",
-                        borderRadius: 1,
-                        width: 28,
-                        height: 28,
-                      }}
-                    >
-                      <ClearAllIcon sx={{ fontSize: 16 }} />
-                    </IconButton>
-                  )}
                 </Box>
 
                 {fromLocationsResponseLoading ? (
-                  Array.from({ length: 5 }).map((_, idx) => (
-                    <Box key={idx} display="flex" gap={2} mb={1}>
-                      <Skeleton variant="rectangular" width="50%" height={40} />
-                      <Skeleton variant="rectangular" width="50%" height={40} />
+                  <Skeleton height={40} />
+                ) : (
+                  filteredFsl.map((item, index) => (
+                    <Box key={index} display="flex" gap={2} mt={1}>
+                      <Box
+                        sx={{
+                          width: "50%",
+                          p: "10px 40px 10px 12px",
+                          backgroundColor: "#f6f8fc",
+                          borderRadius: "8px",
+                          fontSize: 12,
+                          position: "relative",
+                        }}
+                      >
+                        <Typography fontSize={12}>
+                          <strong>{item.site_id}</strong>
+                          <br />
+                          {buildAddressString(item)}
+                        </Typography>
+
+                        <IconButton
+                          size="small"
+                          sx={{
+                            position: "absolute",
+                            right: 6,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                          }}
+                          onClick={() => openEditDialog("FSL", item)}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          width: "50%",
+                          p: 1,
+                          background: "#eef4ff",
+                          borderRadius: 1,
+                          fontSize: 12,
+                        }}
+                      >
+                        Lat: <b>{item.latitude ?? "--"}</b> | Lon:{" "}
+                        <b>{item.longitude ?? "--"}</b>
+                      </Box>
                     </Box>
                   ))
-                ) : (
-                  <>
-                    {filteredFsl.map((item, index) => {
-                      const isEditing =
-                        editing.type === "FSL" && editing.index === index;
-
-                      return (
-                        <Box key={index} display="flex" gap={2} mb={1}>
-                          <Box
-                            sx={{
-                              width: "50%",
-                              p: "10px 40px 10px 12px",
-                              pr: isEditing ? "70px" : "40px",
-                              backgroundColor: isEditing
-                                ? "#eef2ff"
-                                : "#f6f8fc",
-                              borderRadius: "8px",
-                              fontSize: 12,
-                              position: "relative",
-                              border: isEditing
-                                ? "1px solid #8da2fb"
-                                : "1px solid transparent",
-                              transition: "all 0.2s ease",
-                            }}
-                          >
-                            {isEditing ? (
-                              <TextField
-                                variant="standard"
-                                fullWidth
-                                value={editing.value}
-                                onChange={(e) =>
-                                  setEditing({
-                                    ...editing,
-                                    value: e.target.value,
-                                  })
-                                }
-                                InputProps={{
-                                  disableUnderline: true,
-                                  sx: { fontSize: 12 },
-                                }}
-                                autoFocus
-                              />
-                            ) : (
-                              // <Typography fontSize={12}>
-                              //   {buildAddressString(item)}
-                              // </Typography>
-                              <Typography fontSize={12}>
-                                <strong>{item.site_id}</strong>
-                                <br />
-                                {buildAddressString({ ...item, site_id: null })}
-                              </Typography>
-                            )}
-
-                            <Box
-                              sx={{
-                                position: "absolute",
-                                right: 6,
-                                top: "50%",
-                                transform: "translateY(-50%)",
-                                display: "flex",
-                                gap: 0.5,
-                              }}
-                            >
-                              {isEditing ? (
-                                <>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => {
-                                      handleAddressEdit(
-                                        index,
-                                        editing.value,
-                                        "FSL"
-                                      );
-                                      setEditing({
-                                        type: null,
-                                        index: null,
-                                        value: "",
-                                      });
-                                    }}
-                                  >
-                                    ✔
-                                  </IconButton>
-
-                                  <IconButton
-                                    size="small"
-                                    onClick={() =>
-                                      setEditing({
-                                        type: null,
-                                        index: null,
-                                        value: "",
-                                      })
-                                    }
-                                  >
-                                    ✖
-                                  </IconButton>
-                                </>
-                              ) : (
-                                <IconButton
-                                  size="small"
-                                  onClick={() =>
-                                    setEditing({
-                                      type: "FSL",
-                                      index,
-                                      value: buildAddressString(item),
-                                    })
-                                  }
-                                >
-                                  ✏️
-                                </IconButton>
-                              )}
-                            </Box>
-                          </Box>
-
-                          <Box
-                            sx={{
-                              width: "50%",
-                              p: 1,
-                              background: "#eef4ff",
-                              borderRadius: 1,
-                              fontSize: 12,
-                            }}
-                          >
-                            Lat: <b>{item.latitude ?? "--"}</b> | Lon:{" "}
-                            <b>{item.longitude ?? "--"}</b>
-                          </Box>
-                        </Box>
-                      );
-                    })}
-                  </>
                 )}
               </CardContent>
             </Card>
           </Box>
         </motion.div>
       </AnimatePresence>
+
+      {/* ================= EDIT DIALOG ================= */}
+      <Dialog
+        open={editDialog.open}
+        onClose={closeEditDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle
+          sx={{
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#555555",
+            py: 2,
+            px: 2,
+            lineHeight: 1.3,
+          }}
+        >
+          Edit Address
+        </DialogTitle>
+
+        <DialogContent dividers>
+          {editDialog.record && (
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="STREET"
+                  value={editDialog.record.street || ""}
+                  onChange={(e) =>
+                    setEditDialog((prev) => ({
+                      ...prev,
+                      record: { ...prev.record, street: e.target.value },
+                    }))
+                  }
+                  fullWidth
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="CITY"
+                  value={editDialog.record.city || ""}
+                  onChange={(e) =>
+                    setEditDialog((prev) => ({
+                      ...prev,
+                      record: { ...prev.record, city: e.target.value },
+                    }))
+                  }
+                  fullWidth
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="STATE"
+                  value={editDialog.record.state_prov || ""}
+                  onChange={(e) =>
+                    setEditDialog((prev) => ({
+                      ...prev,
+                      record: { ...prev.record, state_prov: e.target.value },
+                    }))
+                  }
+                  fullWidth
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="POSTAL CODE"
+                  value={editDialog.record.postal_code || ""}
+                  onChange={(e) =>
+                    setEditDialog((prev) => ({
+                      ...prev,
+                      record: { ...prev.record, postal_code: e.target.value },
+                    }))
+                  }
+                  fullWidth
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  label="COUNTRY"
+                  value={editDialog.record.country || ""}
+                  onChange={(e) =>
+                    setEditDialog((prev) => ({
+                      ...prev,
+                      record: { ...prev.record, country: e.target.value },
+                    }))
+                  }
+                  fullWidth
+                />
+              </Grid>
+            </Grid>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            className="btn-secondary"
+            variant="contained"
+            sx={{ textTransform: "none" }}
+            onClick={closeEditDialog}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="btn-primary"
+            variant="contained"
+            sx={{ textTransform: "none" }}
+            disabled={updateGeoCodeResponseLoading}
+            onClick={handleSave}
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
