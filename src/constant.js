@@ -8,4 +8,6 @@ export const POST_FROMUPLOAD = "depot-location/upload";
 export const POST_DOWNLOAD = "download-report";
 export const POST_TOLOCATION_TEMPLATE_DOWNLOAD = "download-report";
 export const POST_FROMLOCATION_TEMPLATE_DOWNLOAD = "download-report";
+export const POST_MAPPING_START = 'location-mapping'
+export const LOCATION_MAPPING_PROGRESS = "ws/location-mapping";
 export const POST_MAPPING_DOWNLOAD = "download-report";
