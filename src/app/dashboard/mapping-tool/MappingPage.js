@@ -380,6 +380,7 @@ export default function MappingTab() {
       attributes: columnHeaders,
       data: mappingApiData,
       file_name: "Final Report",
+      data_type: "mapping_report",
     };
     exportDownloadData(POST_MAPPING_DOWNLOAD, payload);
   };
@@ -539,7 +540,7 @@ export default function MappingTab() {
                     {progressMessage}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    No records were found to process. Please upload location data first.
+                    Data mapping is completed and loading started.
                   </Typography>
                   <Button
                     variant="contained"
