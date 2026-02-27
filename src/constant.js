@@ -11,4 +11,7 @@ export const POST_TOLOCATION_TEMPLATE_DOWNLOAD = "download-report";
 export const POST_FROMLOCATION_TEMPLATE_DOWNLOAD = "download-report";
 export const POST_MAPPING_START = 'location-mapping'
 export const LOCATION_MAPPING_PROGRESS = "ws/location-mapping";
+export const MAPS = "get-maps-location"
 export const POST_MAPPING_DOWNLOAD = "download-report";
+export const GET_SELECTED_WAREHOUSES = `depot-locations/resource?status=10100`
+export  const PUT_SELECTED_WAREHOUSES= 'update-depot'
