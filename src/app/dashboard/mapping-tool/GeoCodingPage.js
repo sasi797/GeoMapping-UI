@@ -348,7 +348,7 @@ function MapInner({ onClose, onFilterBySiteId }) {
                 <span style={{ fontSize: 16 }}>{selectedPin.kind === "drop" ? "📦" : "🏭"}</span>
                 <Typography fontSize={12} fontWeight={700}
                   color={selectedPin.kind === "drop" ? "#0369a1" : "#15803d"}>
-                  {selectedPin.kind === "drop" ? "Drop Location" : "FSL Location"}
+                  {selectedPin.kind === "drop" ? "To Location" : "From Location"}
                 </Typography>
               </Box>
               <IconButton size="small" onClick={() => setSelectedPin(null)}
@@ -426,7 +426,7 @@ function MapInner({ onClose, onFilterBySiteId }) {
           }}>
             <Box sx={{ background: accentColor, px: 1.5, py: 1 }}>
               <Typography fontSize={11} fontWeight={700} color="#fff" letterSpacing={0.5}>
-                {activeType === "drop" ? "📦 DROP LOCATIONS" : "🏭 FSL LOCATIONS"}
+                {activeType === "drop" ? "📦 TO LOCATIONS" : "🏭 FROM LOCATIONS"}
               </Typography>
             </Box>
             {[
@@ -447,8 +447,8 @@ function MapInner({ onClose, onFilterBySiteId }) {
             <Box sx={{ px: 1.5, pt: 1, pb: 1.2 }}>
               <Typography fontSize={10} fontWeight={700} color="#aaa" letterSpacing={0.6} mb={0.6}>LEGEND</Typography>
               {[
-                { dot: "#11b4da", label: "Drop Location"       },
-                { dot: "#22c55e", label: "FSL Location"        },
+                { dot: "#11b4da", label: "To Location"       },
+                { dot: "#22c55e", label: "From Location"        },
                 { dot: "#ef4444", label: "Missing Coordinates" },
               ].map(({ dot, label }) => (
                 <Box key={label} display="flex" alignItems="center" gap={0.8} mb={0.4}>
