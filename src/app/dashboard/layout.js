@@ -27,6 +27,7 @@ import {
 
 import fullLogo from "../../assests/splfull-logo.png";
 import Image from "next/image";
+import useDeactiveAllFromLocations from "@/api/FromLocations/FromLocationInactiveAll";
 
 const drawerWidth = 220;
 
@@ -96,7 +97,10 @@ export default function DashboardLayout({ children }) {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, []);
 
-  const handleLogout = () => {
+  const { deactiveAllFromLocations } = useDeactiveAllFromLocations();
+
+  const handleLogout = async() => {
+    await deactiveAllFromLocations("deactivate-all-depots");
     sessionStorage.clear();
     router.push("/auth/signin");
   };

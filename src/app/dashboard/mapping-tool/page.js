@@ -23,6 +23,7 @@ import ToLocationTab from "./ToLocationsPage";
 import FromLocationTab from "./FromLocationsPage";
 import GeoMappingTab from "./GeoCodingPage";
 import MappingTab from "./MappingPage";
+import useDeactiveAllFromLocations from "@/api/FromLocations/FromLocationInactiveAll";
 
 export default function MappingScreen() {
   const [tab, setTab] = useState(0);
@@ -32,6 +33,7 @@ export default function MappingScreen() {
     severity: "warning",
   });
   const [geoConfirmOpen, setGeoConfirmOpen] = useState(false);
+  const { deactiveAllFromLocations } = useDeactiveAllFromLocations();
 
   const handleNext = () => {
     // TAB 0 – mandatory
@@ -80,13 +82,23 @@ export default function MappingScreen() {
     setTab((prev) => Math.min(prev + 1, 3));
   };
 
+    // 👇 Reusable cleanup function
+  const handleCleanup = async () => {
+    sessionStorage.removeItem("hasToLocations");
+    sessionStorage.removeItem("hasFromLocations");
+    sessionStorage.removeItem("geoErrorState");
+    sessionStorage.setItem("isRefreshing", "true");
+    await deactiveAllFromLocations("deactivate-all-depots");
+  };
+
   useEffect(() => {
     const handleBeforeUnload = () => {
       // sessionStorage.clear();
-      sessionStorage.removeItem("hasToLocations");
-      sessionStorage.removeItem("hasFromLocations");
-      sessionStorage.removeItem("geoErrorState");
-      sessionStorage.setItem("isRefreshing", "true");
+      handleCleanup();      
+      // sessionStorage.removeItem("hasToLocations");
+      // sessionStorage.removeItem("hasFromLocations");
+      // sessionStorage.removeItem("geoErrorState");
+      // sessionStorage.setItem("isRefreshing", "true");
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
