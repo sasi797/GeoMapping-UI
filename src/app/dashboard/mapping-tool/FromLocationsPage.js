@@ -135,18 +135,18 @@ export default function FromLocationTab() {
   // Warehouse: always fetch on mount
   // Upload: fetch only if user had previously uploaded (hasFromLocations = true)
   //         so returning to this tab restores the table
-  // useEffect(() => {
-  //   if (mode === "warehouse") {
-  //     setSelectedWarehouses({});
-  //     getFromLocations(GET_FROMLOCATIONS);
-  //   } else if (
-  //     mode === "upload" &&
-  //     sessionStorage.getItem("hasFromLocations") === "true"
-  //   ) {
-  //     getFromLocations(GET_FROMLOCATIONS);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+
+  useEffect(() => {
+    if (mode === "warehouse") {
+      getFromLocations(GET_FROMLOCATIONS_WAREHOUSE);
+    } else if (
+      mode === "upload" &&
+      sessionStorage.getItem("hasFromLocations") === "true"
+    ) {
+      getFromLocations(GET_FROMLOCATIONS);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // useEffect(() => {
   //   if (fromLocationsResponse?.statusCode === 200) {
