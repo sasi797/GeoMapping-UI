@@ -47,8 +47,13 @@ import useFromLocationUpload from "@/api/FromLocations/FromUpload";
 import useExportDownload from "@/api/Download/DownLoadTemplates";
 import CustomWithTablePagination from "@/app/components/CustomTableWithPagination";
 import useUpdateSelectedWarehouse from "@/api/FromLocations/UpdateSelectedWarehouse";
+import { Popover, IconButton } from "@mui/material";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
 export default function FromLocationTab() {
+  const [columnFilters, setColumnFilters] = useState({});
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [activeFilterKey, setActiveFilterKey] = useState(null);
   const {
     getFromLocations,
     fromLocationsResponse,
@@ -217,16 +222,55 @@ export default function FromLocationTab() {
     });
   };
 
-  // ── Warehouse: select all / deselect all ──────────────────────────────────
+  const handleOpenFilter = (event, key) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+    setActiveFilterKey(key);
+  };
+
+  const handleCloseFilter = () => {
+    setAnchorEl(null);
+    setActiveFilterKey(null);
+  };
+
+  const handleColumnFilterChange = (key, value) => {
+    setColumnFilters((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
   const filteredWarehouses = fromLocationApiData.filter((wh) => {
+    // 🔎 Global Search (full table)
     const q = searchQuery.toLowerCase();
-    return (
-      (wh.site_id || "").toLowerCase().includes(q) ||
-      (wh.street || "").toLowerCase().includes(q) ||
-      (wh.city || "").toLowerCase().includes(q) ||
-      (wh.state_prov || "").toLowerCase().includes(q)
+
+    const matchesSearch =
+      !q ||
+      Object.values(wh).some((val) =>
+        val?.toString().toLowerCase().includes(q),
+      );
+
+    // 🔽 Column-specific filters
+    const matchesColumnFilters = Object.entries(columnFilters).every(
+      ([key, value]) => {
+        if (!value) return true;
+        return wh[key]?.toString().toLowerCase().includes(value.toLowerCase());
+      },
     );
+
+    return matchesSearch && matchesColumnFilters;
   });
+
+  // ── Warehouse: select all / deselect all ──────────────────────────────────
+  // const filteredWarehouses = fromLocationApiData.filter((wh) => {
+  //   const q = searchQuery.toLowerCase();
+  //   return (
+  //     (wh.site_id || "").toLowerCase().includes(q) ||
+  //     (wh.street || "").toLowerCase().includes(q) ||
+  //     (wh.city || "").toLowerCase().includes(q) ||
+  //     (wh.state_prov || "").toLowerCase().includes(q)
+  //   );
+  // });
 
   const allFilteredSelected =
     filteredWarehouses.length > 0 &&
@@ -501,7 +545,6 @@ export default function FromLocationTab() {
                             sx={{ p: 0 }}
                           />
                         ),
-                        icon: <WarehouseIcon fontSize="small" />,
                         render: (row) => (
                           <Checkbox
                             size="small"
@@ -512,48 +555,90 @@ export default function FromLocationTab() {
                           />
                         ),
                       },
-                      {
-                        key: "site_id",
-                        label: "Site ID",
-                        icon: <NumbersIcon fontSize="small" />,
-                        render: (row) => row.site_id || "—",
-                      },
-                      {
-                        key: "street",
-                        label: "Street",
-                        icon: <HomeIcon fontSize="small" />,
-                        render: (row) => row.street || "—",
-                      },
-                      {
-                        key: "city",
-                        label: "City",
-                        icon: <LocationCityIcon fontSize="small" />,
-                        render: (row) => row.city || "—",
-                      },
-                      {
-                        key: "state_prov",
-                        label: "State",
-                        icon: <MapIcon fontSize="small" />,
-                        render: (row) => row.state_prov || "—",
-                      },
-                      {
-                        key: "postal_code",
-                        label: "Postal Code",
-                        icon: <MarkunreadMailboxIcon fontSize="small" />,
-                        render: (row) => row.postal_code || "—",
-                      },
-                      {
-                        key: "country",
-                        label: "Country",
-                         icon: <PublicIcon fontSize="small" />,
-                        render: (row) => row.country || "—",
-                      },
+
+                      ...[
+                        {
+                          key: "site_id",
+                          label: "Site ID",
+                          icon: <NumbersIcon fontSize="small" />,
+                        },
+                        {
+                          key: "street",
+                          label: "Street",
+                          icon: <HomeIcon fontSize="small" />,
+                        },
+                        {
+                          key: "city",
+                          label: "City",
+                          icon: <LocationCityIcon fontSize="small" />,
+                        },
+                        {
+                          key: "state_prov",
+                          label: "State",
+                          icon: <MapIcon fontSize="small" />,
+                        },
+                        {
+                          key: "postal_code",
+                          label: "Postal Code",
+                          icon: <MarkunreadMailboxIcon fontSize="small" />,
+                        },
+                        {
+                          key: "country",
+                          label: "Country",
+                          icon: <PublicIcon fontSize="small" />,
+                        },
+                      ].map((col) => ({
+                        key: col.key,
+                        render: (row) => row[col.key] || "—",
+                        label: (
+                          <Box display="flex" alignItems="center" gap={0.5}>
+                            {col.icon}
+                            {col.label}
+
+                            <IconButton
+                              size="small"
+                              onClick={(e) => handleOpenFilter(e, col.key)}
+                            >
+                              <FilterListIcon
+                                fontSize="small"
+                                color={
+                                  columnFilters[col.key] ? "primary" : "inherit"
+                                }
+                              />
+                            </IconButton>
+                          </Box>
+                        ),
+                      })),
                     ]}
                     data={filteredWarehouses}
                     onRowClick={(row) => toggleWarehouse(row.id)}
                     maxHeight="calc(55vh - 40px)"
                   />
                 )}
+                <Popover
+                  open={Boolean(anchorEl)}
+                  anchorEl={anchorEl}
+                  onClose={handleCloseFilter}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "left",
+                  }}
+                >
+                  <Box p={2} width={220}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      placeholder="Type to filter..."
+                      value={columnFilters[activeFilterKey] || ""}
+                      onChange={(e) =>
+                        handleColumnFilterChange(
+                          activeFilterKey,
+                          e.target.value,
+                        )
+                      }
+                    />
+                  </Box>
+                </Popover>
               </motion.div>
             )}
 
