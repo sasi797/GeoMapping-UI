@@ -143,7 +143,7 @@ export default function FromLocationTab() {
       mode === "upload" &&
       sessionStorage.getItem("hasFromLocations") === "true"
     ) {
-      getFromLocations(GET_FROMLOCATIONS);
+      setFromLocationApiData([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -501,6 +501,7 @@ export default function FromLocationTab() {
                             sx={{ p: 0 }}
                           />
                         ),
+                        icon: <WarehouseIcon fontSize="small" />,
                         render: (row) => (
                           <Checkbox
                             size="small"
@@ -514,31 +515,37 @@ export default function FromLocationTab() {
                       {
                         key: "site_id",
                         label: "Site ID",
+                        icon: <NumbersIcon fontSize="small" />,
                         render: (row) => row.site_id || "—",
                       },
                       {
                         key: "street",
                         label: "Street",
+                        icon: <HomeIcon fontSize="small" />,
                         render: (row) => row.street || "—",
                       },
                       {
                         key: "city",
                         label: "City",
+                        icon: <LocationCityIcon fontSize="small" />,
                         render: (row) => row.city || "—",
                       },
                       {
                         key: "state_prov",
                         label: "State",
+                        icon: <MapIcon fontSize="small" />,
                         render: (row) => row.state_prov || "—",
                       },
                       {
                         key: "postal_code",
                         label: "Postal Code",
+                        icon: <MarkunreadMailboxIcon fontSize="small" />,
                         render: (row) => row.postal_code || "—",
                       },
                       {
                         key: "country",
                         label: "Country",
+                         icon: <PublicIcon fontSize="small" />,
                         render: (row) => row.country || "—",
                       },
                     ]}
