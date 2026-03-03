@@ -16,7 +16,7 @@ const TableSkeleton = ({ columns, rowCount = 5 }) => {
       <Table size="small">
         <TableHead>
           <TableRow>
-            {columns.map((col) => (
+            {columns?.map((col) => (
               <TableCell key={col.key} sx={{ fontWeight: 500 }}>
                 <Skeleton variant="text" width={80} />
               </TableCell>
@@ -26,7 +26,7 @@ const TableSkeleton = ({ columns, rowCount = 5 }) => {
         <TableBody>
           {Array.from({ length: rowCount }).map((_, rowIndex) => (
             <TableRow key={rowIndex}>
-              {columns.map((col) => (
+              {columns?.map((col) => (
                 <TableCell key={col.key}>
                   <Skeleton variant="text" width="90%" />
                 </TableCell>

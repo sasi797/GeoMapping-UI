@@ -649,7 +649,7 @@ export default function GeoMappingTab() {
             {/* ════════════════════════════════
                 DROP / TO LOCATIONS CARD
             ════════════════════════════════ */}
-            <Card sx={{ flex: 1, maxHeight: "77vh", overflow: "auto" }}>
+            <Card sx={{ flex: 1, maxHeight: "70vh", overflow: "auto" }}>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                   <Typography fontWeight="bold" color="#555">📦 Map To Locations → Coordinates</Typography>
@@ -735,7 +735,7 @@ export default function GeoMappingTab() {
             {/* ════════════════════════════════
                 FSL / FROM LOCATIONS CARD
             ════════════════════════════════ */}
-            <Card sx={{ flex: 1, maxHeight: "77vh", overflow: "auto" }}>
+            <Card sx={{ flex: 1, maxHeight: "70vh", overflow: "auto" }}>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                   <Typography fontWeight="bold" color="#555">🏭 Map From Locations → Coordinates</Typography>
